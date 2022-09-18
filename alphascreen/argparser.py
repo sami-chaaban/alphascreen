@@ -14,7 +14,7 @@ def argparse():
     jobsetup_opts = optparse.OptionGroup(
         parser, 'Job setup')
 
-    jobsetup_opts.add_option("--table",
+    jobsetup_opts.add_option("--parse",
         action="store", dest="table", type="string", default="", metavar='file',
         help="Path to the excel file (.xlsx) or table (.txt).")
 

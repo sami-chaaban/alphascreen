@@ -293,7 +293,7 @@ def write_modelpngs(df, threshold, overwrite=False):
         
         total+=1
         
-    print("\n>> Wrote png-snapshots for " + str(total) + " pdbs.")
+    #print("\n>> Wrote png-snapshots for " + str(total) + " pdbs.")
         
         
 def summarize_paeandmodel_pdf(df, threshold):

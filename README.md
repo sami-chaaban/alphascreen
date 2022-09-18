@@ -10,14 +10,14 @@ Use this package to generate fastas for a set of interaction partners to run Alp
 
 * Install alphascreen: **`pip install alphascreen`**
 
-* Install some dependancies: **`conda install -c schrodinger pymol-bundle`**
+* Install pymol dependancies: **`conda install -c schrodinger pymol-bundle`**
 
 ## Usage<a name="installation"></a>
 
 ### Job setup
 
 ```
-alphascreen --table filename [options]
+alphascreen --parse filename [options]
 ```
 
 **Options**
