@@ -14,7 +14,7 @@ Use this package to generate fastas for a set of interaction partners to run Alp
 
 ## Usage<a name="installation"></a>
 
-### ```Job setup```
+### Job setup
 
 ```
 alphascreen --table filename [options]
@@ -50,7 +50,7 @@ Name of column heading for uniprot IDs for the first set of interactors. Default
 
 Name of column heading for uniprot IDs for the second set of interactors. Default is "SWISS-PROT Accessions Interactor B".
 
-### ```Check runs```
+### Check runs
 
 ```
 alphascreen --check
@@ -64,7 +64,7 @@ alphascreen --write_unfinished
 
 Checks how many runs are finished so far and writes out a new bash script with the remaining Colabfold commands.
 
-### ```Analyze results```
+### Analyze results
 
 ```
 alphascreen --show_top threshold
