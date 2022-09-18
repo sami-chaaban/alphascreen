@@ -20,11 +20,11 @@ def argparse():
 
     jobsetup_opts.add_option("--fragment",
         action="store", dest="fraglen", type="int", default=500, metavar='fragment-length',
-        help="Average fragment length. Default is 500.")
+        help="Approximate fragment length. Default is 500.")
 
     jobsetup_opts.add_option("--overlap",
         action="store", dest="overlap", type="int", default=50, metavar='overlap-length',
-        help="Sequence is extended by this amount on either side of slices.")
+        help="Sequence is extended by this amount on either side of slices. Default is 50.")
 
     jobsetup_opts.add_option("--dimerize",
         action="store", dest="dimerize", type="string", default="", metavar='dimerize-id',

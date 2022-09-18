@@ -343,4 +343,4 @@ def summarize_paeandmodel_pdf(df, threshold):
             pdf.savefig()
             plt.close('all')
             
-    print("\n>> Wrote " + pdfname)
+    print("\n>> Wrote " + pdfname + "\n")
