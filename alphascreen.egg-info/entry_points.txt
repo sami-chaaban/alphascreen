@@ -1,0 +1,3 @@
+[console_scripts]
+alphascreen = alphascreen.__main__:main
+

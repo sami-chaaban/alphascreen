@@ -256,18 +256,10 @@ def write_top(df, threshold):
     print("\n>> Wrote " + excelname + " and " + csvname)
         
         
-def write_modelpngs(df, threshold, overwrite=False):
-
-    print("\n>> Writing model snapshots...")
-
-    if cmd._COb is None:
-        import pymol2
-        import pymol.invocation
-        pymol.invocation.parse_args(['pymol', '-q']) #-q is quiet flag
-        pymol2.SingletonPyMOL().start()
-
+def write_modelpngs(df, threshold, overwrite=True):
+    
     total=0
-
+    
     for i,result in df[df["iptm"]>threshold].iterrows():
         
         model=result["Model"]
@@ -283,11 +275,11 @@ def write_modelpngs(df, threshold, overwrite=False):
         cmd.ray(600,600)
         cmd.draw(300,300,antialias=2)
         cmd.util.cbc()
-        cmd.png(png1)#, width=900, height=900, dpi=900)
+        cmd.png(png1, width=900, height=900, dpi=900)#,ray=1,dpi=900)
         
         cmd.rotate(axis='x',angle=90)
         cmd.rotate(axis='y',angle=90)
-        cmd.png(png2)#, width=900, height=900, dpi=900)
+        cmd.png(png2, width=900, height=900, dpi=900)#,ray=1,dpi=900)
         
         cmd.delete("all")
         
@@ -325,9 +317,9 @@ def summarize_paeandmodel_pdf(df, threshold):
             png2 = result["Model"][:-4]+"-rotated.png"
             
             if not os.path.exists(png1):
-                sys.exit("Error: The model snapshots could not be found.")
+                sys.exit("Error: " + png1 + " does not exist. Run write_modelpngs.")
             elif not os.path.exists(png2):
-                sys.exit("Error: The model snapshots could not be found.")
+                sys.exit("Error: " + png2 + " does not exist. Run write_modelpngs.")
             
             plt.subplot(1, 3, 2)
             img1=plt.imread(png1)

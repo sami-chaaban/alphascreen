@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: alphascreen
+Version: 0
+Summary: Use colabfold to screen protein-protein interactions.
+Home-page: http://pypi.python.org/pypi/alphascreen/
+Author: Sami Chaaban
+Author-email: chaaban@mrc-lmb.cam.ac.uk
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.8

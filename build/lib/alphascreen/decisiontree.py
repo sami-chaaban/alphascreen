@@ -62,8 +62,6 @@ def decide():
         df = analyze.getscores()
         if df.empty:
             sys.exit("\n>> Error: no results could be found.\n")
-        elif df[df['iptm']>threshold].empty:
-            sys.exit("\n>> Error: no results could be found with an iptm above " + str(threshold) + ".\n")
         analyze.summarize_pae_pdf(df, threshold)
         analyze.write_top(df, threshold)
         analyze.write_modelpngs(df, threshold, overwrite=overwrite)

@@ -50,29 +50,22 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     os.makedirs('fastas', exist_ok=True)
     os.makedirs('results', exist_ok=True)
 
-    for fname in os.listdir('fastas'):
-        if fname.endswith('.fasta'):
-            print(">> Warning: it looks like fasta files already exist in the fastas folder.\n")
-            break
-
     colabfoldcommand = []
     unilst = []
     Anamefail = []
     Bnamefail = []
-
-    print(">> Getting sequences...\n")
 
     for A, B in zip(Ainteractors, Binteractors):
 
         try:
             Aname,Aseq=getuni(A)
         except:
-            Anamefail.append(A)
+            Anamefail.append(Aname)
             continue
         try:
             Bname,Bseq=getuni(B)
         except:
-            Anamefail.append(B)
+            Anamefail.append(Aname)
             continue
             
         unilst.append(A + ":" + Aname)
@@ -142,7 +135,6 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
         print(">> Warning: there was a problem getting the Uniprot data for accessions: ")
         for f in failed:
             print(f)
-        print("\n")
 
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 
@@ -156,9 +148,10 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             for u in list(set(unilst)):
                 f.write(u+"\n")
 
-        print(">> Run the colabfold jobs with \"bash colabfoldrun.bsh\"\n")
+        print(">> Run the alphafold jobs with bash \"colabfoldrun.bsh\"")
     else:
         print(">> There are " + str(len(colabfoldcommand)) + " colabfold commands...\n")
+        
             
     print("Done!\n")
 
@@ -244,9 +237,6 @@ def findunfinished(alphafold_exec, write=True):
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 
     if write:
-        if len(colabfoldcommand) == 0:
-            sys.exit("\n>> There are no jobs left.")
         with open("colabfoldrun-unfinished.bsh", 'w') as f:
             for c in colabfoldcommand:
                 f.write(c)
-        print("\n>> Wrote colabfoldrun-unfinished.bsh")
