@@ -41,6 +41,7 @@ def decide():
     check_write = params['check_write']
     threshold = params['threshold']
     overwrite = params['overwrite']
+    writetable = params['writetable']
 
     ##################################
     #Parse input
@@ -58,7 +59,16 @@ def decide():
 
     ##################################
 
+    if writetable:
+        print("\n>> Parsing results...")
+        df = analyze.getscores()
+        analyze.write_top(df, 0)
+        sys.exit()
+
+    ##################################
+
     if threshold != -1:
+        print("\n>> Parsing results...")
         df = analyze.getscores()
         if df.empty:
             sys.exit("\n>> Error: no results could be found.\n")

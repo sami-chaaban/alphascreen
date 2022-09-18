@@ -71,10 +71,14 @@ def argparse():
     analyze_opts.add_option("--show_top",
         action="store", dest="threshold", type="float", default=-1, metavar="threshold",
         help="Summarize results for top hits (above the threshold specified here) in tables and pdfs.")
+
+    analyze_opts.add_option("--write_table",
+        action="store_true", dest="writetable", default=False,
+        help="Write the full results as a table ranked by iptm.")
     
     analyze_opts.add_option("--overwrite",
         action="store_true", dest="overwrite", default=False,
-        help="Pass this to overwrite snapshot pngs if they already exist.")
+        help="Overwrite snapshot pngs if they already exist.")
 
     parser.add_option_group(analyze_opts)
 

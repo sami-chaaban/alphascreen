@@ -280,7 +280,7 @@ def write_modelpngs(df, threshold, overwrite=False):
         cmd.load(model)
         cmd.cartoon("automatic")
         cmd.bg_color("white")
-        cmd.ray(600,600)
+        cmd.ray(300,300)
         cmd.draw(300,300,antialias=2)
         cmd.util.cbc()
         cmd.png(png1)#, width=900, height=900, dpi=900)
