@@ -20,7 +20,7 @@ Use this package to generate fastas for a set of interaction partners to run Alp
 alphascreen --table filename [options]
 ```
 
-```Options```
+**Options**
 
 **```--fragment```** *```length```*
 
