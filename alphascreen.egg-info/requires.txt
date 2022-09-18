@@ -1,6 +1,0 @@
-pandas
-unipressed
-matplotlib
-numpy
-opencv-python
-openpyxl
