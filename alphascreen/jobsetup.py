@@ -12,6 +12,7 @@ def getuni(ACCESSION):
 
 def getinteractors(file,filetype, columnA, columnB):
     
+    print(">> Reading table...\n")
     if filetype == "table":
         table = pd.read_table(file, usecols=[columnA, columnB])
     elif filetype == "excel":
