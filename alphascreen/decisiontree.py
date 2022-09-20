@@ -93,7 +93,7 @@ def decide():
 
     filetype=""
     if table != "":
-        if table[-4:] == "txt":
+        if table[-4:] == ".txt":
             filetype = "table"
         elif table[-4:] == "xlsx":
             filetype = "excel"

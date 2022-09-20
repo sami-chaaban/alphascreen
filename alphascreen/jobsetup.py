@@ -13,9 +13,9 @@ def getuni(ACCESSION):
 def getinteractors(file,filetype, columnA, columnB):
     
     if filetype == "table":
-        table = pd.read_table(file)
+        table = pd.read_table(file, usecols=[columnA, columnB])
     elif filetype == "excel":
-        table = pd.read_excel(file)
+        table = pd.read_excel(file, usecols=[columnA, columnB])
     
     Ainteractors = table[columnA].tolist()
     Binteractors = table[columnB].tolist()
@@ -36,7 +36,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     repeating_indices = []
     for i, pair in enumerate(zip(Ainteractors, Binteractors)):
         for j, pair_same in enumerate(zip(Ainteractors, Binteractors)):
-            if pair[0] == pair_same[0] and pair[1] == pair_same[1] and i != j:
+            if pair[0] == pair_same[0] and pair[1] == pair_same[1] and i != j: #i != j means that one instance is retained
                 repeating_indices.append(j)
                 #print(pair[0], pair[1], pair_same[0], pair_same[1])
             if pair[0] == pair_same[1] and pair[1] == pair_same[0]:
@@ -139,10 +139,9 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     
     failed = Anamefail + Bnamefail
     if len(failed) > 0:
-        print(">> Warning: there was a problem getting the Uniprot data for accessions: ")
+        print(">> Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
-            print(f)
-        print("\n")
+            print("·· \""+ f + "\"\n")
 
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 

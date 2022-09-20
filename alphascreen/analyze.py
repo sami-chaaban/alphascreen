@@ -240,16 +240,15 @@ def summarize_pae_pdf(df, threshold):
 def write_top(df, threshold):
     
     if threshold == 0:
-        thresholdstr = "all"
+        basename = "Results"
     else:
-        thresholdstr = str(threshold).replace(".", "p")
+        basename = "Results-iptm-above-" + str(threshold).replace(".", "p")
         
-    basename = "iptm-above-"+thresholdstr
     excelname = basename + ".xlsx"
     csvname = basename + ".csv"
     
     with pd.ExcelWriter(excelname) as writer:  
-        df[df['iptm']>threshold].to_excel(writer, sheet_name="iptm-above-"+thresholdstr)
+        df[df['iptm']>threshold].to_excel(writer)
         
     df.to_csv(csvname)
     
@@ -260,11 +259,11 @@ def write_modelpngs(df, threshold, overwrite=False):
 
     print("\n>> Writing model snapshots...")
 
-    if cmd._COb is None:
-        import pymol2
-        import pymol.invocation
-        pymol.invocation.parse_args(['pymol', '-q']) #-q is quiet flag
-        pymol2.SingletonPyMOL().start()
+    #if cmd._COb is None:
+    #    import pymol2
+    #    import pymol.invocation
+    #    pymol.invocation.parse_args(['pymol', '-q']) #-q is quiet flag
+    #    pymol2.SingletonPyMOL().start()
 
     total=0
 
@@ -277,19 +276,20 @@ def write_modelpngs(df, threshold, overwrite=False):
         if not overwrite and os.path.exists(png1) and os.path.exists(png2):
             continue
         
-        cmd.load(model)
+        cmd.load(model, "current")
         cmd.cartoon("automatic")
         cmd.bg_color("white")
-        cmd.ray(300,300)
-        cmd.draw(300,300,antialias=2)
+        #cmd.ray(600,600)
+        #cmd.draw(300,300,antialias=2)
+        cmd.zoom()
         cmd.util.cbc()
-        cmd.png(png1)#, width=900, height=900, dpi=900)
+        cmd.png(png1, width=900, height=900, dpi=900)
         
         cmd.rotate(axis='x',angle=90)
         cmd.rotate(axis='y',angle=90)
-        cmd.png(png2)#, width=900, height=900, dpi=900)
+        cmd.png(png2, width=900, height=900, dpi=900)
         
-        cmd.delete("all")
+        cmd.delete("current")
         
         total+=1
         
