@@ -28,7 +28,15 @@ def argparse():
 
     jobsetup_opts.add_option("--dimerize",
         action="store", dest="dimerize", type="string", default="", metavar='dimerize-id',
-        help="Uniprot ID to dimerize.")
+        help="Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.")
+
+    jobsetup_opts.add_option("--dimerize_all",
+        action="store_true", dest="dimerize_all", default=False,
+        help="Dimerize all proteins.")
+
+    jobsetup_opts.add_option("--dimerize_all_except",
+        action="store", dest="dimerize_except", type="string", default="", metavar='ids-not-to-dimerize',
+        help="Provide a text file (.txt) with a single column list of uniprot IDs to NOT dimerize. Everything else will be dimerized.")
 
     jobsetup_opts.add_option("--consider",
         action="store", dest="consider", type="string", default="", metavar='sequence-to-consider',

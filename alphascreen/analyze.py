@@ -183,11 +183,9 @@ def getinfo_frompaename(paejson):
 def summarize_pae_pdf(df, threshold):
     
     if threshold == 0:
-        thresholdstr = "all"
+        pdfname = "PAEs.pdf"
     else:
-        thresholdstr = str(threshold).replace(".", "p")
-
-    pdfname = "PAEs-iptm-above-" + thresholdstr + ".pdf"
+        pdfname = "PAEs-iptm-above-" + str(threshold).replace(".", "p") + ".pdf"
     
     with PdfPages(pdfname) as pdf:
         for i, result in df[df["iptm"]>threshold].iterrows():
@@ -275,6 +273,9 @@ def write_modelpngs(df, threshold, overwrite=False):
         
         if not overwrite and os.path.exists(png1) and os.path.exists(png2):
             continue
+
+        if os.path.exists(png1):
+            os.rename(png1, model[:-4]+"-backup.png")
         
         cmd.load(model, "current")
         cmd.cartoon("automatic")
@@ -284,9 +285,17 @@ def write_modelpngs(df, threshold, overwrite=False):
         cmd.zoom()
         cmd.util.cbc()
         cmd.png(png1, width=900, height=900, dpi=900)
+
+        if not os.path.exists(png1):
+            if os.path.exists(model[:-4]+"-backup.png"):
+                os.rename(model[:-4]+"-backup.png", png1)
+            sys.exit("\n>> Error: pymol didn't output anything.\nFailed on: "+model+"\n")
+        elif os.path.exists(model[:-4]+"-backup.png"):
+            os.remove(model[:-4]+"-backup.png")
         
         cmd.rotate(axis='x',angle=90)
         cmd.rotate(axis='y',angle=90)
+        cmd.zoom()
         cmd.png(png2, width=900, height=900, dpi=900)
         
         cmd.delete("current")
@@ -299,11 +308,9 @@ def write_modelpngs(df, threshold, overwrite=False):
 def summarize_paeandmodel_pdf(df, threshold):
     
     if threshold == 0:
-        thresholdstr = "all"
+        pdfname = "PAEs-Models.pdf"
     else:
-        thresholdstr = str(threshold).replace(".", "p")
-
-    pdfname = "PAEs-Models-iptm-above-" + thresholdstr + ".pdf"
+        pdfname = "PAEs-Models-iptm-above-"+ str(threshold).replace(".", "p") + ".pdf"
     
     with PdfPages(pdfname) as pdf:
         for i, result in df[df["iptm"]>threshold].iterrows():
@@ -325,9 +332,9 @@ def summarize_paeandmodel_pdf(df, threshold):
             png2 = result["Model"][:-4]+"-rotated.png"
             
             if not os.path.exists(png1):
-                sys.exit("Error: The model snapshots could not be found.")
+                sys.exit("\n>> Error: The model snapshots could not be found.\n")
             elif not os.path.exists(png2):
-                sys.exit("Error: The model snapshots could not be found.")
+                sys.exit("\n>> Error: The model snapshots could not be found.\n")
             
             plt.subplot(1, 3, 2)
             img1=plt.imread(png1)

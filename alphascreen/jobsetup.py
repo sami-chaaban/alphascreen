@@ -12,7 +12,7 @@ def getuni(ACCESSION):
 
 def getinteractors(file,filetype, columnA, columnB):
     
-    print(">> Reading table...\n")
+    print("\n>> Reading table...\n")
     if filetype == "table":
         table = pd.read_table(file, usecols=[columnA, columnB])
     elif filetype == "excel":
@@ -23,12 +23,30 @@ def getinteractors(file,filetype, columnA, columnB):
     
     return(Ainteractors, Binteractors)
 
-def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraglen=500,overlap=50,dimerize="",write=True,alphafold_exec="colabfold2"):
+def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
     
-    print("\nStarting...\n")
+    #print("\nStarting...\n")
     
-    if dimerize != "":
-        print(">> Dimerizing uniprot " + dimerize + "...\n")
+    dimerizelst = []
+    dontdimerizelst = []
+
+    if dimerize_all:
+        print(">> Dimerizing all proteins...\n")
+
+    elif dimerize_except:
+        print(">> Dimerizing all proteins except those in " + dimerize_except + "...\n")
+        with open(dimerize_except) as f:
+            dontdimerizelst=[line.strip() for line in f.readlines()]
+
+    elif dimerize != "":
+        if dimerize[-4:] == ".txt":
+            print(">> Dimerizing uniprot IDs in " + dimerize + "...\n")
+            with open(dimerize) as f:
+                dimerizelst=[line.strip() for line in f.readlines()]
+        else:
+            dimerizelst = [dimerize]
+            print(">> Dimerizing uniprot ID " + dimerize + "...\n")
+
 
     if consideruniprot != "":
         print(">> Only considering " + str(considerstart+1) + "-" + str(considerend+1) + " for uniprot ID"+consideruniprot+"...\n")
@@ -53,13 +71,17 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     for fname in os.listdir('fastas'):
         if fname.endswith('.fasta'):
-            print(">> Warning: it looks like fasta files already exist in the fastas folder.\n")
+            print("!! Warning: it looks like fasta files already exist in the fastas folder.\n")
             break
 
     colabfoldcommand = []
     unilst = []
     Anamefail = []
     Bnamefail = []
+
+    if len(dontdimerizelst) != 0:
+        alluniprots = list(set(list(Ainteractors+Binteractors)))
+        dimerizelst = [i for i in alluniprots if i not in dontdimerizelst]
 
     print(">> Getting sequences...\n")
 
@@ -92,15 +114,6 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                     sys.exit(">> Error: last amino acid to consider is outside the protein length. Maximum is " + str(len(Bseq)+1) + "\n")
                 Bseq = Bseq[considerstart:considerend]
                 addmeB = considerstart
-
-        todimer = ""
-        if dimerize != "":
-            if dimerize == A:
-                todimer = "A"
-            elif dimerize == B:
-                todimer = "B"
-            with open("dimerized-"+A+"-"+Aname, 'w') as f:
-                f.write("")
         
         if split:
             #print(Aname)
@@ -128,12 +141,12 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                         
                         f.write(">"+An+"\n"+As+"\n")
                         
-                        if todimer == "A":
+                        if A in dimerizelst or dimerize_all:
                             f.write(">"+An+"\n"+As+"\n")
                             
                         f.write(">"+Bn+"\n"+Bs+"\n")
                         
-                        if todimer == "B":
+                        if B in dimerizelst or dimerize_all:
                             f.write(">"+Bn+"\n"+Bs+"\n")
 
                 colabfoldcommand.append(alphafold_exec + " " + fastaname_minimal + " --output=results/" + An + "-" + Bn)

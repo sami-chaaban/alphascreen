@@ -32,6 +32,8 @@ def decide():
     fraglen = params['fraglen']
     overlap = params['overlap']
     dimerize = params['dimerize']
+    dimerize_all = params['dimerize_all']
+    dimerize_except = params['dimerize_except']
     consider = params['consider']
     dontwrite = params['dontwrite']
     alphafold_exec = params['alphafold_exec']
@@ -102,7 +104,7 @@ def decide():
 
         Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB)
 
-        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraglen=fraglen,overlap=overlap,dimerize=dimerize,write=towrite,alphafold_exec=alphafold_exec)
+        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
 
     ##################################
 

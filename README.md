@@ -30,9 +30,17 @@ Approximate fragment length. Default is 500.
 
 Sequence is extended by this amount on either side of slices. Default is 50.
 
-**```--dimerize```** *```uniprot-id```*
+**```--dimerize```** *```uniprot-id```* *or* *```uniprot-ids.txt```*
 
 Dimerize this uniprot ID whenever it is found.
+
+**```--dimerize_all```**
+
+Dimerize all proteins.
+
+**```--dimerize_all_except```** *```uniprot-ids.txt```*
+
+Provide a text file (.txt) with a single column list of uniprot IDs to NOT dimerize. Everything else will be dimerized.
 
 **```--consider```** *```uniprot/start/end```*
 
