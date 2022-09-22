@@ -18,7 +18,7 @@ The results can be ranked by iptm score and compiled into a pdf showing all PAEs
 
 ## Bugs<a name="bugs"></a>
 
-* Pymol often crashes or hangs during analysis.
+* The pymol package often crashes or hangs during model-snapshot generation.
 
 ## Usage<a name="usage"></a>
 
