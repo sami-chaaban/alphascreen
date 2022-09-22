@@ -1,6 +1,6 @@
 # alphascreen
 
-Use this package to generate fastas for a set of interaction partners to run Alphafold predictions.
+Use this package to generate fastas for a set of interaction partners to run Alphafold predictions. The output of ```--parse``` is a bash script that allows you to run Alphafold on all the generated fasta files. This depends on the syntax for submitting jobs on your system, which will likely require you to edit *jobsetup.py* accordingly.
 
 ## Installation<a name="installation"></a>
 
