@@ -2,7 +2,7 @@
 
 Use this package to generate fastas for a set of interaction partners to run Alphafold predictions. The input is a table which includes two columns containing uniprot IDs for the interaction partners. The sequences are fetched from Uniprot and fragmented before generating fasta files. Fragmenting helps keep the total sequence length short enough so the jobs to run out of memory.
 
-The output is a bash script that allows you to run Alphafold on all the generated fasta files. This depends on the syntax for submitting jobs on your system, which will likely require you to edit *jobsetup.py* accordingly.
+The output is a bash script that allows you to run Alphafold on all the generated fasta files. This depends on the syntax for submitting jobs on your system, which will likely require you to edit *jobsetup.py* accordingly. Importantly, the results should be output into a "results" directory for analysis to work. This has only been tested on Colabfold 1.3.0 and the file naming system it uses.
 
 The results can be ranked by iptm score and compiled into a pdf showing all PAEs next to snapshots of the predictions.
 
