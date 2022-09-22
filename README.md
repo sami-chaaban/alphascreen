@@ -86,7 +86,7 @@ Checks how many runs are finished so far and writes out a new bash script with t
 alphascreen --show_top threshold (--overwrite)
 ```
 
-Generate summary files for the runs so far. Only iptms above the threshold value provided will be considered (e.g. ```alphascreen --show_top 0.3``` for iptms above 0.3). Pass the "overwrite" option to overwrite snapshots that have already been generated, otherwise it will skip those to save time.
+Generate summary files for the runs so far. Only iptms above the threshold value provided will be considered (e.g. ```alphascreen --show_top 0.3``` for iptms above 0.3). Optionally, pass the "--overwrite" option to overwrite snapshots that have already been generated, otherwise it will skip those to save time.
 
 ```
 alphascreen --write_table
