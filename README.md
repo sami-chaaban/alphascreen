@@ -12,7 +12,11 @@ Use this package to generate fastas for a set of interaction partners to run Alp
 
 * Install pymol dependancies: **`conda install -c schrodinger pymol-bundle`**
 
-## Usage<a name="installation"></a>
+## Bugs<a name="bugs"></a>
+
+* Pymol often crashes or hangs during analysis.
+
+## Usage<a name="usage"></a>
 
 ### Job setup
 
