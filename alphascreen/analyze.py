@@ -38,6 +38,26 @@ def getscores():
     #get all data
     for scorepath in Path('results').rglob('scores.txt'):
 
+        resultname = str(scorepath.parent).split("/")[-1]
+        
+        try:
+            next(Path('results/'+resultname).glob("*PAE*.png"))
+        except StopIteration:
+            print("\n>> Warning: skipping " + resultname + " since it is missing the PAE png file.")
+            continue
+            
+        try:
+            next(Path('results/'+resultname).glob("*_rank*.pdb"))
+        except StopIteration:
+            print("\n>> Warning: skipping " + resultname + " since it is missing PDB files.")
+            continue
+            
+        try:
+            next(Path('results/'+resultname).glob("*_scores.json"))
+        except StopIteration:
+            print("\n>> Warning: skipping " + resultname + " since it is missing the scores json files.")
+            continue
+
         with open(scorepath) as f:
             lines=f.readlines()
             iptms=[float(x.split(' ')[0].split(":")[1]) for x in lines]
@@ -51,7 +71,7 @@ def getscores():
         iptmhighscore_lst.append(iptms[m])
         ptmhighscore_lst.append(ptms[m])
         
-        resultname = str(scorepath.parent).split("/")[-1]
+        #resultname = str(scorepath.parent).split("/")[-1]
         ProteinA=resultname.split("-")[0]
         ProteinB=resultname.split("-")[1]
         ProteinAmin=ProteinA.split("_")[0]+"_"+ProteinA.split("_")[1]
@@ -257,11 +277,9 @@ def write_modelpngs(df, threshold, overwrite=False):
 
     print("\n>> Writing model snapshots...")
 
-    #if cmd._COb is None:
-    #    import pymol2
-    #    import pymol.invocation
-    #    pymol.invocation.parse_args(['pymol', '-q']) #-q is quiet flag
-    #    pymol2.SingletonPyMOL().start()
+    import time
+    import pymol
+    pymol.finish_launching(['pymol', '-qc']) #-Q will suppress render outputs too
 
     total=0
 
@@ -284,7 +302,13 @@ def write_modelpngs(df, threshold, overwrite=False):
         #cmd.draw(300,300,antialias=2)
         cmd.zoom()
         cmd.util.cbc()
-        cmd.png(png1, width=900, height=900, dpi=900)
+        cmd.png(png1, width=600, height=600, dpi=900)
+
+        pngexists=False
+        while not pngexists:
+            if os.path.exists(png1):
+                pngexists=True
+            time.sleep(0.25)
 
         if not os.path.exists(png1):
             if os.path.exists(model[:-4]+"-backup.png"):
@@ -296,7 +320,13 @@ def write_modelpngs(df, threshold, overwrite=False):
         cmd.rotate(axis='x',angle=90)
         cmd.rotate(axis='y',angle=90)
         cmd.zoom()
-        cmd.png(png2, width=900, height=900, dpi=900)
+        cmd.png(png2, width=600, height=600, dpi=900)
+
+        pngexists=False
+        while not pngexists:
+            if os.path.exists(png2):
+                pngexists=True
+            time.sleep(0.25)
         
         cmd.delete("current")
         
@@ -349,5 +379,7 @@ def summarize_paeandmodel_pdf(df, threshold):
             
             pdf.savefig()
             plt.close('all')
-            
+
     print("\n>> Wrote " + pdfname + "\n")
+
+    print(">> If there is an error below, ignore it.")
