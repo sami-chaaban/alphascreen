@@ -209,6 +209,8 @@ def summarize_pae_pdf(df, threshold):
     else:
         pdfname = "PAEs-iptm-above-" + str(threshold).replace(".", "p") + ".pdf"
     
+    print("\n>> Writing " + pdfname)
+
     with PdfPages(pdfname) as pdf:
         for i, result in df[df["iptm"]>threshold].iterrows():
             pae, protnames, protlens = getinfo_frompaename(result["PAE-json"])
@@ -216,8 +218,6 @@ def summarize_pae_pdf(df, threshold):
             plt.title("\n".join(wrap(result["Model"], 80)), fontsize=8)
             pdf.savefig()
             plt.close('all')
-            
-    print("\n>> Wrote " + pdfname)
 
 # def show_pdb(modelname, chains, show_sidechains, show_mainchains=False, color="chain"):
     
@@ -304,11 +304,7 @@ def write_modelpngs(df, threshold, overwrite=False):
         cmd.util.cbc()
         cmd.png(png1, width=600, height=600, dpi=900)
 
-        pngexists=False
-        while not pngexists:
-            if os.path.exists(png1):
-                pngexists=True
-            time.sleep(0.25)
+        waitfor(png1)
 
         if not os.path.exists(png1):
             if os.path.exists(model[:-4]+"-backup.png"):
@@ -322,19 +318,25 @@ def write_modelpngs(df, threshold, overwrite=False):
         cmd.zoom()
         cmd.png(png2, width=600, height=600, dpi=900)
 
-        pngexists=False
-        while not pngexists:
-            if os.path.exists(png2):
-                pngexists=True
-            time.sleep(0.25)
-        
+        waitfor(png2)
+
         cmd.delete("current")
         
         total+=1
         
     #print("\n>> Wrote png-snapshots for " + str(total) + " pdbs.")
         
-        
+def waitfor(filename):
+    pngexists=False
+    tic = time.perf_counter()
+    while not pngexists:
+        if os.path.exists(filename):
+            pngexists=True
+        time.sleep(0.25)
+        toc = time.perf_counter()
+        if toc-tic > 3:
+            sys.exit("\n>> Error: pymol didn't output anything in 3 seconds for file:\n"+filename)
+    
 def summarize_paeandmodel_pdf(df, threshold):
     
     if threshold == 0:
@@ -342,6 +344,8 @@ def summarize_paeandmodel_pdf(df, threshold):
     else:
         pdfname = "PAEs-Models-iptm-above-"+ str(threshold).replace(".", "p") + ".pdf"
     
+    print("\n>> Writing " + pdfname + "\n")
+
     with PdfPages(pdfname) as pdf:
         for i, result in df[df["iptm"]>threshold].iterrows():
             
@@ -379,7 +383,5 @@ def summarize_paeandmodel_pdf(df, threshold):
             
             pdf.savefig()
             plt.close('all')
-
-    print("\n>> Wrote " + pdfname + "\n")
 
     print(">> If there is an error below, ignore it." + "\n")
