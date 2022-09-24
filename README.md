@@ -18,10 +18,6 @@ The results can be compiled into a pdf showing all PAEs next to snapshots of the
 
 * Install pymol dependancies: **`conda install -c schrodinger pymol-bundle`**
 
-## Bugs<a name="bugs"></a>
-
-* The pymol package often crashes or hangs during model-snapshot generation.
-
 ## Usage<a name="usage"></a>
 
 ### Job setup

@@ -10,6 +10,8 @@ from pymol import cmd
 import cv2 as cv
 import glob
 import sys
+import time
+import pymol
 
 def getscores():
 
@@ -277,8 +279,6 @@ def write_modelpngs(df, threshold, overwrite=False):
 
     print("\n>> Writing model snapshots...")
 
-    import time
-    import pymol
     pymol.finish_launching(['pymol', '-qc']) #-Q will suppress render outputs too
 
     total=0
@@ -382,4 +382,4 @@ def summarize_paeandmodel_pdf(df, threshold):
 
     print("\n>> Wrote " + pdfname + "\n")
 
-    print(">> If there is an error below, ignore it.")
+    print(">> If there is an error below, ignore it." + "\n")
