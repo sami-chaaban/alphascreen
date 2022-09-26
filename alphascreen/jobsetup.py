@@ -10,7 +10,7 @@ def getuni(ACCESSION):
     NAME = ENTRY['uniProtkbId']
     return(NAME, SEQ)
 
-def getinteractors(file,filetype, columnA, columnB):
+def getinteractors(file,filetype, columnA, columnB, focus):
     
     print("\n>> Reading table...\n")
     if filetype == "table":
@@ -20,8 +20,22 @@ def getinteractors(file,filetype, columnA, columnB):
     
     Ainteractors = table[columnA].tolist()
     Binteractors = table[columnB].tolist()
-    
-    return(Ainteractors, Binteractors)
+
+    if focus != "":
+        if focus not in Ainteractors or focus not in Binteractors:
+            print("!! Warning: the uniprot ID " + focus + " was not found.\n")
+        Ainteractors_fixed = []
+        Binteractors_fixed = []
+        for A, B in zip(Ainteractors,Binteractors):
+            if B == focus:
+                Ainteractors_fixed.append(B)
+                Binteractors_fixed.append(A)
+            else:
+                Ainteractors_fixed.append(A)
+                Binteractors_fixed.append(B)
+        return(Ainteractors_fixed, Binteractors_fixed)
+    else:
+        return(Ainteractors, Binteractors)
 
 def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
     

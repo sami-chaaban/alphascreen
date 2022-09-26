@@ -28,6 +28,10 @@ alphascreen --parse filename [options]
 
 **Options**
 
+**```--focus```** *```uniprot-id```*
+
+Uniprot ID to focus on. This means that it will the first chain in any predictions that contain it.
+
 **```--fragment```** *```length```*
 
 Approximate fragment length. Default is 500.

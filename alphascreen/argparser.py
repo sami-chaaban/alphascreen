@@ -18,9 +18,13 @@ def argparse():
         action="store", dest="table", type="string", default="", metavar='file',
         help="Path to the excel file (.xlsx) or table (.txt).")
 
+    jobsetup_opts.add_option("--focus",
+        action="store", dest="focus", type="string", default="", metavar='uniprot-id',
+        help="Uniprot ID to focus on. This means that it will the first chain in any predictions that contain it.")
+
     jobsetup_opts.add_option("--fragment",
         action="store", dest="fraglen", type="int", default=500, metavar='fragment-length',
-        help="Approximate fragment length. Default is 500.")
+        help="Approximate fragment length. Default is 500. For shorter fragments, try 250.")
 
     jobsetup_opts.add_option("--overlap",
         action="store", dest="overlap", type="int", default=50, metavar='overlap-length',

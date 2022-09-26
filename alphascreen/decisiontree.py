@@ -29,6 +29,7 @@ def decide():
     params = argparser.argparse()
 
     table = params['table']
+    focus = params['focus']
     fraglen = params['fraglen']
     overlap = params['overlap']
     dimerize = params['dimerize']
@@ -102,7 +103,7 @@ def decide():
         else:
             sys.exit("\n>> Error: did not recognize filetype.\n")
 
-        Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB)
+        Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB, focus)
 
         jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
 
