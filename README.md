@@ -104,6 +104,6 @@ Only output all the results into a table ranked by iptm score. This is run autom
 
 Overwrite snapshots that have already been generated, otherwise it will skip those to save time.
 
-**```--rankby```**
+**```--rankby```** *```iptm```* or *```ptm```*
 
 Score by which models are ranked (ptm or iptm). Default is iptm. This is used for both choosing the best model in a prediction and then ranking the best models in the summaries.
