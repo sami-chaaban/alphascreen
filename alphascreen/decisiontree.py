@@ -45,6 +45,7 @@ def decide():
     threshold = params['threshold']
     overwrite = params['overwrite']
     writetable = params['writetable']
+    rankby = params['rankby']
 
     ##################################
     #Parse input
@@ -64,7 +65,7 @@ def decide():
 
     if writetable:
         print("\n>> Parsing results...")
-        df = analyze.getscores()
+        df = analyze.getscores(rankby)
         analyze.write_top(df, 0)
         sys.exit()
 
@@ -72,15 +73,15 @@ def decide():
 
     if threshold != -1:
         print("\n>> Parsing results...")
-        df = analyze.getscores()
+        df = analyze.getscores(rankby)
         if df.empty:
             sys.exit("\n>> Error: no results could be found.\n")
-        elif df[df['iptm']>threshold].empty:
-            sys.exit("\n>> Error: no results could be found with an iptm above " + str(threshold) + ".\n")
-        analyze.summarize_pae_pdf(df, threshold)
-        analyze.write_top(df, threshold)
-        analyze.write_modelpngs(df, threshold, overwrite=overwrite)
-        analyze.summarize_paeandmodel_pdf(df, threshold)
+        elif df[df[rankby]>threshold].empty:
+            sys.exit("\n>> Error: no results could be found with "+rankby+" above " + str(threshold) + ".\n")
+        analyze.summarize_pae_pdf(df, threshold, rankby)
+        analyze.write_top(df, threshold, rankby)
+        analyze.write_modelpngs(df, threshold, rankby, overwrite=overwrite)
+        analyze.summarize_paeandmodel_pdf(df, threshold, rankby)
         sys.exit()
 
     ##################################

@@ -12,8 +12,9 @@ import glob
 import sys
 import time
 import pymol
+import math
 
-def getscores():
+def getscores(rankby):
 
     proteinA_lst=[]
     proteinB_lst=[]
@@ -41,35 +42,46 @@ def getscores():
     for scorepath in Path('results').rglob('scores.txt'):
 
         resultname = str(scorepath.parent).split("/")[-1]
-        
-        try:
-            next(Path('results/'+resultname).glob("*PAE*.png"))
-        except StopIteration:
-            print("\n>> Warning: skipping " + resultname + " since it is missing the PAE png file.")
-            continue
             
         try:
-            next(Path('results/'+resultname).glob("*_rank*.pdb"))
+            next(Path('results/'+resultname).glob("*rank*.pdb"))
         except StopIteration:
             print("\n>> Warning: skipping " + resultname + " since it is missing PDB files.")
             continue
             
         try:
             next(Path('results/'+resultname).glob("*_scores.json"))
+            scorewildcard="_scores.json"
         except StopIteration:
-            print("\n>> Warning: skipping " + resultname + " since it is missing the scores json files.")
-            continue
+            try:
+                next(Path('results/'+resultname).glob("*_pae.json"))
+                scorewildcard="_pae.json"
+            except StopIteration:
+                print("\n>> Warning: skipping " + resultname + " since it is missing the scores json files.")
+                continue
+
+        try:
+            next(Path('results/'+resultname).glob("*PAE*.png"))
+            for path in Path('results/'+resultname).glob("*PAE*.png"):
+                paepng_lst.append(str(path))
+        except StopIteration:
+            paepng_lst.append("-")
 
         with open(scorepath) as f:
             lines=f.readlines()
             iptms=[float(x.split(' ')[0].split(":")[1]) for x in lines]
             ptms=[float(x.split(' ')[1].split(":")[1]) for x in lines]
         
-        if len(lines) == 0:
-            continue
+        #if len(lines) == 0:
+        #    continue
         
-        m = np.argmax(iptms)
-        
+        if rankby=="iptm":
+            m = np.argmax(iptms)
+        elif rankby=="ptm":
+            m = np.argmax(ptms)
+        else:
+            sys.exit("\n>> Provide ptm or iptm as the ranking method.\n")
+
         iptmhighscore_lst.append(iptms[m])
         ptmhighscore_lst.append(ptms[m])
         
@@ -83,9 +95,9 @@ def getscores():
 
         modelnumlst = []
         pdbpaths = []
-        for path in Path('results/'+resultname).glob("*_rank*.pdb"):
+        for path in Path('results/'+resultname).glob("*rank*.pdb"):
             pdbpaths.append(str(path))
-            modelnum = str(path).split("model_")[-1].split(".pdb")[0]
+            modelnum = str(path).split("model_")[-1].split(".pdb")[0].split("_")[0]
             modelnumlst.append(int(modelnum)-1) #-1 is to turn it into index (0-4) since numbers are 1-5
          
         modelindex = modelnumlst.index(m)
@@ -93,11 +105,12 @@ def getscores():
         pdbname = pdbpaths[modelindex]
         pdbname_lst.append(pdbname)
 
-        for path in Path('results/'+resultname).glob("*PAE*.png"):
-            paepng_lst.append(str(path))
-
-        for path in Path('results/'+resultname).glob(pdbname.split("/")[-1][:-4]+"*_scores.json"):
-            paejson_lst.append(str(path))
+        if scorewildcard == "_scores.json":
+            for path in Path('results/'+resultname).glob(pdbname.split("/")[-1][:-4]+scorewildcard):
+                paejson_lst.append(str(path))
+        elif scorewildcard == "_pae.json":
+            for path in Path('results/'+resultname).glob("rank_*_model_"+modelnum+"_ptm_seed_0"+scorewildcard):
+                paejson_lst.append(str(path))
         
         if existuniprot:
             foundA=False
@@ -129,6 +142,8 @@ def getscores():
         dimerized_uniprot_lst = ["-"]*len(proteinA_lst)
         dimerized_name_lst = ["-"]*len(proteinA_lst)
             
+    #print(len(proteinA_lst), len(proteinB_lst), len(iptmhighscore_lst), len(ptmhighscore_lst), len(pdbname_lst), len(paepng_lst), len(paejson_lst))
+
     df = pd.DataFrame(
         {'Protein A': proteinA_lst,
          'Protein B': proteinB_lst,
@@ -143,8 +158,8 @@ def getscores():
          'SWISS-PROT Accessions Interactor B' : uniprotB_lst
         })
         
-    df.sort_values(by=['iptm'], ascending=False, ignore_index=True, inplace=True)
-        
+    df.sort_values(by=[rankby], ascending=False, ignore_index=True, inplace=True)
+
     return(df)
 
 def make_paeplot(pae, protnames, protlens):
@@ -176,7 +191,9 @@ def make_paeplot(pae, protnames, protlens):
 def getinfo_frompaename(paejson):
 
     scores = json.loads(Path(paejson).read_text())
-    pae = scores["pae"]
+
+    pae = scores["pae"]            
+
     nameA = str(paejson).split("results/")[1].split("/")[0].split("-")[0]
     nameB = str(paejson).split("results/")[1].split("/")[0].split("-")[1]
     fasta=str(paejson).split("results/")[0]+"fastas/"+nameA+"-"+nameB+".fasta"
@@ -195,6 +212,33 @@ def getinfo_frompaename(paejson):
     
     return(pae, protnames, protlens)
 
+def getinfo_frompaename_legacy(paejson):
+
+    scores = json.loads(Path(paejson).read_text())
+
+    pae = scores[0]["distance"]
+    splitby = int(math.sqrt(len(pae)))
+    pae = [pae[i:i + splitby] for i in range(0, len(pae), splitby)]
+
+    nameA = str(paejson).split("results/")[1].split("/")[0].split("-")[0]
+    nameB = str(paejson).split("results/")[1].split("/")[0].split("-")[1]
+    fasta=str(paejson).split("results/")[0]+"fastas/"+nameA+"-"+nameB+".fasta"
+    with open(fasta, 'r') as f:
+        lines = f.readlines()
+    protnames = []
+    protlens = []
+    for i, a in enumerate(lines):
+        if a[0]==">":
+            protnames.append(a[1:])
+            protlens.append(len(lines[i+1]))
+
+    #lenprotA = int(nameA.split("_")[-1]) - int(nameA.split("_")[-2]) + 1
+    #lenprotB = int(nameB.split("_")[-1]) - int(nameB.split("_")[-2]) + 1
+    #nameprotA = nameA.split("_")[0] + " " + nameA.split("_")[1] + "\n" + nameA.split("_")[2]+ "-" + nameA.split("_")[3]
+    #nameprotB = nameB.split("_")[0] + " " + nameB.split("_")[1] + "\n" + nameB.split("_")[2]+ "-" + nameB.split("_")[3]
+    
+    return(pae, protnames, protlens)
+
 # def showpae(paejson):
 
 #     pae, protnames, protlens = getinfo_frompaename(paejson)
@@ -202,18 +246,24 @@ def getinfo_frompaename(paejson):
 #     plt.show()
 #     return(len(protnames))
     
-def summarize_pae_pdf(df, threshold):
+def summarize_pae_pdf(df, threshold, rankby):
     
     if threshold == 0:
         pdfname = "PAEs.pdf"
     else:
-        pdfname = "PAEs-iptm-above-" + str(threshold).replace(".", "p") + ".pdf"
+        pdfname = "PAEs-"+rankby+"-above-" + str(threshold).replace(".", "p") + ".pdf"
     
     print("\n>> Writing " + pdfname)
 
     with PdfPages(pdfname) as pdf:
-        for i, result in df[df["iptm"]>threshold].iterrows():
-            pae, protnames, protlens = getinfo_frompaename(result["PAE-json"])
+        for i, result in df[df[rankby]>threshold].iterrows():
+            try:
+                pae, protnames, protlens = getinfo_frompaename(result["PAE-json"])
+            except:
+                try:
+                    pae, protnames, protlens = getinfo_frompaename_legacy(result["PAE-json"])
+                except:
+                    sys.exit("\n>> Could not interpret the PAE json file.\n")
             plt = make_paeplot(pae, protnames, protlens)
             plt.title("\n".join(wrap(result["Model"], 80)), fontsize=8)
             pdf.savefig()
@@ -257,25 +307,25 @@ def summarize_pae_pdf(df, threshold):
 #     view.zoomTo()
 #     return view
 
-def write_top(df, threshold):
+def write_top(df, threshold, rankby):
     
     if threshold == 0:
         basename = "Results"
     else:
-        basename = "Results-iptm-above-" + str(threshold).replace(".", "p")
+        basename = "Results-"+rankby+"-above-" + str(threshold).replace(".", "p")
         
     excelname = basename + ".xlsx"
     csvname = basename + ".csv"
     
     with pd.ExcelWriter(excelname) as writer:  
-        df[df['iptm']>threshold].to_excel(writer)
+        df[df[rankby]>threshold].to_excel(writer)
         
     df.to_csv(csvname)
     
     print("\n>> Wrote " + excelname + " and " + csvname)
         
         
-def write_modelpngs(df, threshold, overwrite=False):
+def write_modelpngs(df, threshold, rankby, overwrite=False):
 
     print("\n>> Writing model snapshots...")
 
@@ -283,7 +333,7 @@ def write_modelpngs(df, threshold, overwrite=False):
 
     total=0
 
-    for i,result in df[df["iptm"]>threshold].iterrows():
+    for i,result in df[df[rankby]>threshold].iterrows():
         
         model=result["Model"]
         png1 = model[:-4]+".png"
@@ -337,24 +387,31 @@ def waitfor(filename):
         if toc-tic > 3:
             sys.exit("\n>> Error: pymol didn't output anything in 3 seconds for file:\n"+filename)
     
-def summarize_paeandmodel_pdf(df, threshold):
+def summarize_paeandmodel_pdf(df, threshold, rankby):
     
     if threshold == 0:
         pdfname = "PAEs-Models.pdf"
     else:
-        pdfname = "PAEs-Models-iptm-above-"+ str(threshold).replace(".", "p") + ".pdf"
+        pdfname = "PAEs-Models-"+rankby+"-above-"+ str(threshold).replace(".", "p") + ".pdf"
     
     print("\n>> Writing " + pdfname + "\n")
 
     with PdfPages(pdfname) as pdf:
-        for i, result in df[df["iptm"]>threshold].iterrows():
+        for i, result in df[df[rankby]>threshold].iterrows():
             
             plottitle = [result["Model"],"iptm: "+str("{:.2f}".format(result["iptm"])),"ptm: "+str("{:.2f}".format(result["ptm"])),result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
             if result["Dimerized-protein"] != "-":
                 plottitle.append("Dimerized: " + result["Dimerized-protein"])
             plottitle = "\n".join(plottitle)
             
-            pae, protnames, protlens = getinfo_frompaename(result["PAE-json"])
+            try:
+                pae, protnames, protlens = getinfo_frompaename(result["PAE-json"])
+            except:
+                try:
+                    pae, protnames, protlens = getinfo_frompaename_legacy(result["PAE-json"])
+                except:
+                    sys.exit("\n>> Could not interpret the PAE json file.\n")
+
             fig = plt.figure(figsize=(60,20))
             fig.suptitle(plottitle, fontsize=28)
             plt.subplot(1, 3, 1)

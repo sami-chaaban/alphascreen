@@ -87,10 +87,14 @@ def argparse():
     analyze_opts.add_option("--write_table",
         action="store_true", dest="writetable", default=False,
         help="Write the full results as a table ranked by iptm.")
+
+    jobsetup_opts.add_option("--rankby",
+        action="store", dest="rankby", type="string", default="iptm", metavar='ptm-or-iptm',
+        help="Score by which models are ranked (ptm or iptm). Default is iptm. This is used for both choosing the best model in a prediction and then ranking the best models in the summaries.")
     
     analyze_opts.add_option("--overwrite",
         action="store_true", dest="overwrite", default=False,
-        help="Overwrite snapshot pngs if they already exist.")
+        help="Overwrite snapshot pngs if they already exist. Default is False.")
 
     parser.add_option_group(analyze_opts)
 
