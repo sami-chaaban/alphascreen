@@ -92,6 +92,12 @@ alphascreen --show_top threshold [options]
 
 Generate summary files for the runs so far. Only iptms above the threshold value provided will be considered (e.g. ```alphascreen --show_top 0.3``` for iptms above 0.3).
 
+```
+alphascreen --write_table (--rankby)
+```
+
+Only output all the results into a table ranked by iptm score. This is run automatically in ```--showtop```.
+
 **Options**
 
 **```--overwrite```**
@@ -101,9 +107,3 @@ Overwrite snapshots that have already been generated, otherwise it will skip tho
 **```--rankby```**
 
 Score by which models are ranked (ptm or iptm). Default is iptm. This is used for both choosing the best model in a prediction and then ranking the best models in the summaries.
-
-```
-alphascreen --write_table (--rankby)
-```
-
-Only output all the results into a table ranked by iptm score. This is run automatically in ```--showtop```.
