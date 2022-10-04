@@ -101,10 +101,12 @@ def decide():
             filetype = "table"
         elif table[-4:] == "xlsx":
             filetype = "excel"
-        else:
-            sys.exit("\n>> Error: did not recognize filetype.\n")
 
-        Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB, focus)
+        if filetype!="":
+            Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB, focus)
+        else:
+            Ainteractors = [table.split("/")[0]]
+            Binteractors = [table.split("/")[1]]
 
         jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
 

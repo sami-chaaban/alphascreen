@@ -23,6 +23,12 @@ The results can be compiled into a pdf showing all PAEs next to snapshots of the
 ### Job setup
 
 ```
+alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
+```
+
+Generate the fasta files and Alphafold commands for the input uniprot IDs.
+
+```
 alphascreen --parse filename [options]
 ```
 
