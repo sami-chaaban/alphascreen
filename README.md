@@ -119,19 +119,19 @@ Checks how many runs are finished so far and writes out a new bash script with t
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.8``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. See the ```--rankby``` option below for more information on the threshold. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), which can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.8``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. Only those with scaled PAEs higher than 0.8 are shown. See the ```--rankby``` option below for more information on the scaled PAE. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), which can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
 
 ```
 alphascreen --write_table [options]
 ```
 
-Like ```--show_top```, but only outputs the table for all the ranked predictions.
+Like ```--show_top```, but only outputs the table. No threshold value is considered, all predictions are ranked and output.
 
 **Options**
 
 **```--rankby```** *```pae```* or *```iptm```* or *```ptm```*
 
-Score by which models are ranked (pae, iptm, or ptm). Default is pae. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a scores.txt file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm```)
+Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). Default is ***pae***. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a ***scores.txt*** file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm``` is a good starting point).
 
 **```--overwrite```**
 
