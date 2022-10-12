@@ -179,7 +179,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     if write:
         print(">> Writing " + str(len(colabfoldcommand)) + " colabfold commands...\n")
-        with open("colabfoldrun.bsh", 'w') as f:
+        with open("alphascreen.bsh", 'w') as f:
             for c in colabfoldcommand:
                 f.write(c+"\n")
                 
@@ -187,7 +187,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             for u in list(set(unilst)):
                 f.write(u+"\n")
 
-        print(">> Run the colabfold jobs with \"bash colabfoldrun.bsh\"\n")
+        print(">> Run the colabfold jobs with \"bash alphascreen.bsh\"\n")
     else:
         print(">> There are " + str(len(colabfoldcommand)) + " colabfold commands...\n")
             
@@ -277,7 +277,7 @@ def findunfinished(alphafold_exec, write=True):
     if write:
         if len(colabfoldcommand) == 0:
             sys.exit("\n>> There are no jobs left.")
-        with open("colabfoldrun-unfinished.bsh", 'w') as f:
+        with open("alphascreen-unfinished.bsh", 'w') as f:
             for c in colabfoldcommand:
                 f.write(c)
-        print("\n>> Wrote colabfoldrun-unfinished.bsh")
+        print("\n>> Wrote alphascreen-unfinished.bsh")
