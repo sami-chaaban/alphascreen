@@ -73,7 +73,7 @@ Sequence is extended by this amount on either side of slices. Default is 50.
 
 **```--dimerize```** *```uniprot-id```* *or* *```uniprot-ids.txt```*
 
-Dimerize this uniprot ID whenever it is found.
+Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.
 
 **```--dimerize_all```**
 
@@ -87,7 +87,7 @@ Provide a text file (.txt) with a single column list of uniprot IDs to NOT dimer
 
 Uniprot ID and sequence range to consider. Example: "Q86VS8/1/200" only considers amino acids 1-200 for uniprot ID Q86VS8.
 
-**```--alphafold_exec```** *```path-to-colabfold-executable```*
+**```--alphafold_exec```** *```colabfold-executable```*
 
 Path to script that runs Colabfold for writing the commands. Default is "colabfold2".
 
@@ -119,19 +119,19 @@ Checks how many runs are finished so far and writes out a new bash script with t
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. Only models whereby the parameter specified by ```rankby``` is above the threshold valuewill be considered (e.g. ```alphascreen --show_top 0.3 --rankby iptm``` for iptms above 0.3).
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.8``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. See the ```--rankby``` option below for more information on the threshold. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), which can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
 
 ```
 alphascreen --write_table [options]
 ```
 
-Only output all the results into a table ranked by iptm score. This is run automatically in ```--showtop```.
+Like ```--show_top```, but only outputs the table for all the ranked predictions.
 
 **Options**
 
 **```--rankby```** *```pae```* or *```iptm```* or *```ptm```*
 
-Score by which models are ranked (pae, iptm, or ptm). Default is pae. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point) The options ```iptm``` and ```ptm``` rely on a scores.txt file in each results directory (see explanation at the top).
+Score by which models are ranked (pae, iptm, or ptm). Default is pae. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a scores.txt file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm```)
 
 **```--overwrite```**
 
