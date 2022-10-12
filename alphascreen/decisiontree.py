@@ -69,7 +69,7 @@ def decide():
     if writetable:
         print("\n>> Parsing results...")
         df = analyze.getscores(rankby)
-        analyze.write_top(df, 0)
+        analyze.write_top(df, 0, rankby)
         sys.exit()
 
     ##################################

@@ -61,7 +61,7 @@ These values are just an example. Note the presence/absence of spaces and placem
 alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
 ```
 
-* Generate the fasta files and Alphafold commands for the input table.
+* Generate the fasta files and Alphafold commands for the input table. The file can be .txt (e.g. as output by Biogrid) or .xlsx.
 
 ```
 alphascreen --parse filename [options]
@@ -129,7 +129,7 @@ alphascreen --write_unfinished
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.8``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. Only those with scaled PAEs higher than 0.8 are shown. See the ```--rankby``` option below for more information on the scaled PAE. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), which can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.8``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. Only those with scaled PAEs higher than 0.8 are shown. See the ```--rankby``` option below for more information on the scaled PAE. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), and the .xlsx can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
 
 ```
 alphascreen --write_table [options]
