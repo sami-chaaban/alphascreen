@@ -51,17 +51,17 @@ If you want instead want to rank by iptm score, you can pass ```--rankby iptm```
 
 ### Job setup<a name="jobsetup"></a>
 
+* Generate the fasta files and Alphafold commands for the input uniprot IDs.
+
 ```
 alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
 ```
 
-Generate the fasta files and Alphafold commands for the input uniprot IDs.
+* Generate the fasta files and Alphafold commands for the input table.
 
 ```
 alphascreen --parse filename [options]
 ```
-
-Generate the fasta files and Alphafold commands for the input table.
 
 **Options**
 
@@ -95,7 +95,7 @@ Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only consider
 
 **```--alphafold_exec```** *```alphafold-executable```*
 
-Path to script that runs Alphafold for writing the commands. Default is *colabfold2*.
+Path to script that runs Alphafold for writing the commands. Default is *colabfold2* as per the LMB cluster usage.
 
 **```--columnA```** *```columnA-name```*
 
@@ -111,7 +111,7 @@ Name of column heading for uniprot IDs for the second set of interactors. Defaul
 alphascreen --check
 ```
 
-Checks how many runs are finished so far.
+Checks how many runs are finished so far and how many remain.
 
 ```
 alphascreen --write_unfinished
@@ -131,7 +131,7 @@ Generate summary files for the runs so far. For example, ```alphascreen --show_t
 alphascreen --write_table [options]
 ```
 
-Like ```--show_top```, but only outputs the table. No threshold value is considered, all predictions are ranked and output.
+Like ```--show_top```, but only outputs the table (.xlsx and .csv). No threshold value is considered; all predictions are ranked and output.
 
 **Options**
 
