@@ -131,7 +131,7 @@ Like ```--show_top```, but only outputs the table. No threshold value is conside
 
 **```--rankby```** *```pae```* or *```iptm```* or *```ptm```*
 
-Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). Default is ***pae***. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a ***scores.txt*** file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm``` is a good starting point).
+Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm``` is a good starting point).
 
 **```--overwrite```**
 
