@@ -178,8 +178,8 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 
     if write:
-        print(">> Writing " + str(len(colabfoldcommand)) + " colabfold commands...\n")
-        with open("alphascreen.bsh", 'w') as f:
+        print(">> Writing " + str(len(colabfoldcommand)) + " Alphafold commands...\n")
+        with open("runpredictions.bsh", 'w') as f:
             for c in colabfoldcommand:
                 f.write(c+"\n")
                 
@@ -187,9 +187,9 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             for u in list(set(unilst)):
                 f.write(u+"\n")
 
-        print(">> Run the colabfold jobs with \"bash alphascreen.bsh\"\n")
+        print(">> Run the Alphafold jobs with \"bash runpredictions.bsh\"\n")
     else:
-        print(">> There are " + str(len(colabfoldcommand)) + " colabfold commands...\n")
+        print(">> There are " + str(len(colabfoldcommand)) + " Alphafold commands...\n")
             
     print("Done!\n")
 
@@ -256,7 +256,7 @@ def findunfinished(alphafold_exec, write=True):
         resultdir = "results" + str(fastapath).split("fastas")[1][:-6]
 
         if not os.path.exists(resultdir) and not warned:
-            print("\n>> Warning: could not find one of the directories. Make sure this the right directory where the colabfold jobs were run.")
+            print("\n>> Warning: could not find one of the directories. Make sure this the right directory where the Alphafold jobs were run.")
             warned=True
         
         found = False
@@ -277,7 +277,7 @@ def findunfinished(alphafold_exec, write=True):
     if write:
         if len(colabfoldcommand) == 0:
             sys.exit("\n>> There are no jobs left.")
-        with open("alphascreen-unfinished.bsh", 'w') as f:
+        with open("runpredictions-unfinished.bsh", 'w') as f:
             for c in colabfoldcommand:
                 f.write(c)
-        print("\n>> Wrote alphascreen-unfinished.bsh")
+        print("\n>> Wrote runpredictions-unfinished.bsh")

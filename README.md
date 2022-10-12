@@ -29,7 +29,7 @@ The sequences are fetched from Uniprot and fragmented before generating fasta fi
 
 ### Running the predictions
 
-The output is a bash script (*alphascreen.bsh*) that allows you to run Alphafold on all the generated fasta files on your machine/cluster. The syntax is set up for the LMB cluster, and will therefore likely not correspond to what you use in your system. You can either edit *alphascreen.bsh* or *jobsetup.py* itself so that the Alphafold submission commands have the right syntax. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and therefore its file naming system. Be careful before running the script since it will submit all jobs and rely on your queuing system to handle the submissions.
+The output is a bash script (*runpredictions.bsh*) that allows you to run Alphafold on all the generated fasta files on your machine/cluster. The syntax is set up for the LMB cluster, and will therefore likely not correspond to what you use in your system. You can either edit *runpredictions.bsh* or *jobsetup.py* itself so that the Alphafold submission commands have the right syntax. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and therefore its file naming system. Be careful before running the script since it will submit all jobs and rely on your queuing system to handle the submissions.
 
 ### Analyzing the results
 
@@ -93,9 +93,9 @@ Provide a text file (.txt) with a single column list of uniprot IDs to NOT dimer
 
 Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only considers amino acids 1-200 for uniprot ID Q86VS8.
 
-**```--alphafold_exec```** *```colabfold-executable```*
+**```--alphafold_exec```** *```alphafold-executable```*
 
-Path to script that runs Colabfold for writing the commands. Default is *colabfold2*.
+Path to script that runs Alphafold for writing the commands. Default is *colabfold2*.
 
 **```--columnA```** *```columnA-name```*
 
@@ -117,7 +117,7 @@ Checks how many runs are finished so far.
 alphascreen --write_unfinished
 ```
 
-Checks how many runs are finished so far and writes out a new bash script with the remaining Colabfold commands.
+Checks how many runs are finished so far and writes out a new bash script with the remaining Alphafold commands.
 
 ### Analysis<a name="analysis"></a>
 
