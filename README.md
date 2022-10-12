@@ -11,7 +11,7 @@
 
 ## Features<a name="features"></a>
 
-* Gets the fasta sequences from uniprot IDs contained in a table of paired proteins.
+* Fetches the fasta sequences of the uniprot IDs contained in a table of paired proteins.
 
 * Chops up the sequences so that they are of reasonable size for subsequent pairwise predictions.
 
@@ -67,13 +67,13 @@ These values are just an example. Note the presence/absence of spaces and placem
 
 ### Job setup<a name="jobsetup"></a>
 
-* Generate the fasta files and Alphafold commands for the input uniprot IDs.
+* If you have two large proteins and want to generate fragmented predictions:
 
 ```
 alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
 ```
 
-* Generate the fasta files and Alphafold commands for the input table. The file can be .txt (e.g. as output by Biogrid) or .xlsx.
+* If you have a list of potential interactors in two columns within a table. The file can be .txt (e.g. as output by Biogrid) or .xlsx.
 
 ```
 alphascreen --parse filename [options]
@@ -93,7 +93,7 @@ Approximate fragment length. Default is 500.
 
 Sequence is extended by this amount on either side of slices. Default is 50.
 
-**```--dimerize```** *```uniprot-id```* *or* *```uniprot-ids.txt```*
+**```--dimerize```** *```uniprot-id```* or *```uniprot-ids.txt```*
 
 Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.
 
