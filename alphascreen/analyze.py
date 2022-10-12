@@ -22,6 +22,8 @@ def getscores(rankby):
     uniprotB_lst=[]
     iptmhighscore_lst = []
     ptmhighscore_lst = []
+    mincrosspae_lst = []
+    inv_mincrosspae_lst = []
     pdbname_lst = []
     paepng_lst = []
     paejson_lst = []
@@ -38,54 +40,52 @@ def getscores(rankby):
             uniprotlst.append([l.split(":")[0], l.split(":")[1].replace("\n","")])
         #print(uniprotlst)
 
-    #get all data
-    for scorepath in Path('results').rglob('scores.txt'):
+    skipped=0
 
-        resultname = str(scorepath.parent).split("/")[-1]
+    for resultdir in Path('results').glob('*/'):
+
+        resultdir = str(resultdir)
+        resultname = resultdir.split("/")[-1]
             
         try:
-            next(Path('results/'+resultname).glob("*rank*.pdb"))
+            next(Path(resultdir).glob("*rank*.pdb"))
         except StopIteration:
-            print("\n>> Warning: skipping " + resultname + " since it is missing PDB files.")
+            skipped+=1
+            #print("\n>> Warning: skipping " + resultname + " since it is missing PDB files.")
             continue
             
         try:
-            next(Path('results/'+resultname).glob("*_scores.json"))
+            next(Path(resultdir).glob("*_scores.json"))
             scorewildcard="_scores.json"
         except StopIteration:
             try:
-                next(Path('results/'+resultname).glob("*_pae.json"))
+                next(Path(resultdir).glob("*_pae.json"))
                 scorewildcard="_pae.json"
             except StopIteration:
                 print("\n>> Warning: skipping " + resultname + " since it is missing the scores json files.")
+                skipped+=1
+                continue
+
+        if os.path.exists(resultdir+"/scores.txt"):
+            with open(resultdir+"/scores.txt") as f:
+                lines=f.readlines()
+                iptms=[float(x.split(' ')[0].split(":")[1]) for x in lines]
+                ptms=[float(x.split(' ')[1].split(":")[1]) for x in lines]
+        else:
+            iptms=["-"] * len(pdbpaths)
+            ptms=["-"] * len(pdbpaths)
+            if rankby in ["iptm, ptm"]:
+                print("\n>> Warning: skipping " + resultname + " since it is missing the scores.txt file with the iptms and ptms.")
+                skipped+=1
                 continue
 
         try:
-            next(Path('results/'+resultname).glob("*PAE*.png"))
-            for path in Path('results/'+resultname).glob("*PAE*.png"):
+            next(Path(resultdir).glob("*PAE*.png"))
+            for path in Path(resultdir).glob("*PAE*.png"):
                 paepng_lst.append(str(path))
         except StopIteration:
             paepng_lst.append("-")
-
-        with open(scorepath) as f:
-            lines=f.readlines()
-            iptms=[float(x.split(' ')[0].split(":")[1]) for x in lines]
-            ptms=[float(x.split(' ')[1].split(":")[1]) for x in lines]
         
-        #if len(lines) == 0:
-        #    continue
-        
-        if rankby=="iptm":
-            m = np.argmax(iptms)
-        elif rankby=="ptm":
-            m = np.argmax(ptms)
-        else:
-            sys.exit("\n>> Provide ptm or iptm as the ranking method.\n")
-
-        iptmhighscore_lst.append(iptms[m])
-        ptmhighscore_lst.append(ptms[m])
-        
-        #resultname = str(scorepath.parent).split("/")[-1]
         ProteinA=resultname.split("-")[0]
         ProteinB=resultname.split("-")[1]
         ProteinAmin=ProteinA.split("_")[0]+"_"+ProteinA.split("_")[1]
@@ -95,22 +95,21 @@ def getscores(rankby):
 
         modelnumlst = []
         pdbpaths = []
-        for path in Path('results/'+resultname).glob("*rank*.pdb"):
+        for path in Path(resultdir).glob("*rank*.pdb"):
             pdbpaths.append(str(path))
             modelnum = str(path).split("model_")[-1].split(".pdb")[0].split("_")[0]
             modelnumlst.append(int(modelnum)-1) #-1 is to turn it into index (0-4) since numbers are 1-5
          
-        modelindex = modelnumlst.index(m)
-        
-        pdbname = pdbpaths[modelindex]
-        pdbname_lst.append(pdbname)
-
+        paejsons=[]
+        paenumlst=[]
         if scorewildcard == "_scores.json":
-            for path in Path('results/'+resultname).glob(pdbname.split("/")[-1][:-4]+scorewildcard):
-                paejson_lst.append(str(path))
+            for path in Path(resultdir).glob("*_model_*_scores.json"):
+                paejsons.append(str(path))
+                paenumlst.append(int(str(path).split("_scores.json")[0].split("_model_")[-1])-1)
         elif scorewildcard == "_pae.json":
-            for path in Path('results/'+resultname).glob("rank_*_model_"+modelnum+"_ptm_seed_0"+scorewildcard):
-                paejson_lst.append(str(path))
+            for path in Path(resultdir).glob("rank_*_model_*_ptm_seed_0_pae.json"):
+                paejsons.append(str(path))
+                paenumlst.append(int(str(path).split("_ptm_seed_0_pae.json")[0].split("_model_")[-1])-1)
         
         if existuniprot:
             foundA=False
@@ -128,19 +127,41 @@ def getscores(rankby):
                 print("Could not find uniprot ID for " + ProteinAmin)
             if not foundB:
                 print("Could not find uniprot ID for " + ProteinBmin)
+
+
+        if rankby in ["iptm", "ptm"]:
+            if rankby == "iptm":
+                m = np.argmax(iptms)
+            else:
+                m = np.argmax(ptms)
+        elif rankby=="scaledPAE":
+            minpaes=[]
+            for paejson in paejsons:
+                minpaes.append(getmincrosspae(paejson))
+            m = paenumlst[np.argmin(minpaes)]
+            # For the future: if same crosspae, choose best iptm
+            # if len([k for k in minpaes if k == min(minpaes)]) > 1:
+            #     print("there are multiple solutions for " + str(scorepath))
+        else:
+            sys.exit("\n>> Provide ptm, iptm, or pae as the ranking method.\n")
+
+        iptmhighscore_lst.append(iptms[m])
+        ptmhighscore_lst.append(ptms[m])
+
+        paejson_lst.append(paejsons[paenumlst.index(m)])
+        if rankby=="scaledPAE":
+            mincrosspae_lst.append(minpaes[paenumlst.index(m)])
+            inv_mincrosspae_lst.append(1-(minpaes[paenumlst.index(m)]/30))
+        else:
+            mincrosspae_lst.append("-")
+            inv_mincrosspae_lst.append("-")
+
+        pdbname = pdbpaths[modelnumlst.index(m)]
+        pdbname_lst.append(pdbname)
                 
     if not existuniprot:
         uniprotA_lst = ["-"] * len(proteinA_lst)
         uniprotB_lst = ["-"] * len(proteinB_lst)
-     
-    dimerized = glob.glob('dimerized*')
-    
-    if len(dimerized) > 0:
-        dimerized_uniprot_lst = [dimerized[0].split("/")[-1].split("-")[1]]*len(proteinA_lst)
-        dimerized_name_lst = [dimerized[0].split("/")[-1].split("-")[2]]*len(proteinA_lst)
-    else:
-        dimerized_uniprot_lst = ["-"]*len(proteinA_lst)
-        dimerized_name_lst = ["-"]*len(proteinA_lst)
             
     #print(len(proteinA_lst), len(proteinB_lst), len(iptmhighscore_lst), len(ptmhighscore_lst), len(pdbname_lst), len(paepng_lst), len(paejson_lst))
 
@@ -149,16 +170,18 @@ def getscores(rankby):
          'Protein B': proteinB_lst,
          'iptm': iptmhighscore_lst,
          'ptm': ptmhighscore_lst,
+         'minPAE': mincrosspae_lst,
+         'scaledPAE': inv_mincrosspae_lst,
          'Model': pdbname_lst,
          'PAE-png': paepng_lst,
          'PAE-json': paejson_lst,
-         'Dimerized-protein': dimerized_name_lst,
-         'Dimerized-uniprot': dimerized_uniprot_lst,
          'SWISS-PROT Accessions Interactor A' : uniprotA_lst,
          'SWISS-PROT Accessions Interactor B' : uniprotB_lst
         })
         
     df.sort_values(by=[rankby], ascending=False, ignore_index=True, inplace=True)
+
+    print("\n>> Warning: skipped " + str(skipped) + " since they were missing necessary files.")
 
     return(df)
 
@@ -177,11 +200,11 @@ def make_paeplot(pae, protnames, protlens):
         
         currlen = currlen + l
         
-        plt.axvline(x=currlen, color='k')
-        plt.axhline(y=currlen, color='k')
+        plt.axvline(x=currlen-1, color='k')
+        plt.axhline(y=currlen-1, color='k')
     
-    plt.xlim(1, currlen)
-    plt.ylim(1, currlen)
+    plt.xlim(1, currlen-1)
+    plt.ylim(1, currlen-1)
     plt.yticks(yticklocs, newprotnames, rotation='horizontal')
     plt.gca().invert_yaxis()
     
@@ -245,11 +268,45 @@ def getinfo_frompaename_legacy(paejson):
 #     plt = make_paeplot(pae, protnames, protlens)
 #     plt.show()
 #     return(len(protnames))
-    
+
+def getpae(paejson):
+    try:
+        return(getinfo_frompaename(paejson))
+    except:
+        try:
+            return(getinfo_frompaename_legacy(paejson))
+        except:
+            sys.exit("\n>> Could not interpret the PAE json file.\n")
+
+def getmincrosspae(paejson):
+
+    pae, protnames, protlens = getpae(paejson)
+
+    if len(protnames) == 2:
+
+        subgrid = np.array(pae)[(protlens[0]+2):, 0:(protlens[0]-2)]
+
+    elif len(protnames) == 3:
+
+        if protnames[0] == protnames[1]:
+            dimerlen = protlens[0]+protlens[1] # which should be the same
+            subgrid = np.array(pae)[(dimerlen+2):, 0:(dimerlen-2)]
+
+        else:
+            dimerlen = protlens[1]+protlens[2] # which should be the same
+            subgrid = np.array(pae)[(protlens[0]+2):, 0:(protlens[0]-2)]
+
+    elif len(protnames) == 4:
+
+        dimerlen = protlens[0]+protlens[1]
+        subgrid = np.array(pae)[(dimerlen+2):, 0:(dimerlen-2)]
+
+    return(subgrid.min())
+
 def summarize_pae_pdf(df, threshold, rankby):
     
     if threshold == 0:
-        pdfname = "PAEs.pdf"
+        pdfname = "PAEs-rankedby-" + rankby + ".pdf"
     else:
         pdfname = "PAEs-"+rankby+"-above-" + str(threshold).replace(".", "p") + ".pdf"
     
@@ -257,13 +314,7 @@ def summarize_pae_pdf(df, threshold, rankby):
 
     with PdfPages(pdfname) as pdf:
         for i, result in df[df[rankby]>threshold].iterrows():
-            try:
-                pae, protnames, protlens = getinfo_frompaename(result["PAE-json"])
-            except:
-                try:
-                    pae, protnames, protlens = getinfo_frompaename_legacy(result["PAE-json"])
-                except:
-                    sys.exit("\n>> Could not interpret the PAE json file.\n")
+            pae, protnames, protlens = getpae(result["PAE-json"])
             plt = make_paeplot(pae, protnames, protlens)
             plt.title("\n".join(wrap(result["Model"], 80)), fontsize=8)
             pdf.savefig()
@@ -384,8 +435,8 @@ def waitfor(filename):
             pngexists=True
         time.sleep(0.25)
         toc = time.perf_counter()
-        if toc-tic > 3:
-            sys.exit("\n>> Error: pymol didn't output anything in 3 seconds for file:\n"+filename)
+        if toc-tic > 4:
+            sys.exit("\n>> Error: pymol didn't output anything in 4 seconds for file:\n"+filename)
     
 def summarize_paeandmodel_pdf(df, threshold, rankby):
     
@@ -399,9 +450,10 @@ def summarize_paeandmodel_pdf(df, threshold, rankby):
     with PdfPages(pdfname) as pdf:
         for i, result in df[df[rankby]>threshold].iterrows():
             
-            plottitle = [result["Model"],"iptm: "+str("{:.2f}".format(result["iptm"])),"ptm: "+str("{:.2f}".format(result["ptm"])),result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
-            if result["Dimerized-protein"] != "-":
-                plottitle.append("Dimerized: " + result["Dimerized-protein"])
+            if rankby=="scaledPAE":
+                plottitle = [result["Model"],"iptm: "+str("{:.2f}".format(result["iptm"])),"ptm: "+str("{:.2f}".format(result["ptm"])),"minimum-pae: "+str("{:.2f}".format(result["minPAE"])),result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
+            else:
+                plottitle = [result["Model"],"iptm: "+str("{:.2f}".format(result["iptm"])),"ptm: "+str("{:.2f}".format(result["ptm"])),result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
             plottitle = "\n".join(plottitle)
             
             try:

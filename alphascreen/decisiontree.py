@@ -61,6 +61,9 @@ def decide():
         jobsetup.findunfinished(alphafold_exec, write=towrite)
         sys.exit()
 
+    if rankby=="pae":
+        rankby="scaledPAE"
+
     ##################################
 
     if writetable:

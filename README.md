@@ -96,20 +96,20 @@ Checks how many runs are finished so far and writes out a new bash script with t
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. Only iptms above the threshold value provided will be considered (e.g. ```alphascreen --show_top 0.3``` for iptms above 0.3).
+Generate summary files for the runs so far. Only models whereby the parameter specified by ```rankby``` is above the threshold valuewill be considered (e.g. ```alphascreen --show_top 0.3 --rankby iptm``` for iptms above 0.3).
 
 ```
-alphascreen --write_table (--rankby)
+alphascreen --write_table [options]
 ```
 
 Only output all the results into a table ranked by iptm score. This is run automatically in ```--showtop```.
 
 **Options**
 
+**```--rankby```** *```pae```* or *```iptm```* or *```ptm```*
+
+Score by which models are ranked (pae, iptm, or ptm). Default is pae. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point) The options ```iptm``` and ```ptm``` rely on a scores.txt file in each results directory (see explanation at the top).
+
 **```--overwrite```**
 
-Overwrite snapshots that have already been generated, otherwise it will skip those to save time.
-
-**```--rankby```** *```iptm```* or *```ptm```*
-
-Score by which models are ranked (ptm or iptm). Default is iptm. This is used for both choosing the best model in a prediction and then ranking the best models in the summaries.
+Overwrite snapshots that have already been generated, otherwise it will skip those to save time. This is only relevant for ``show_top``.

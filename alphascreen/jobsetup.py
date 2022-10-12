@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from pathlib import Path
 import sys
+import numpy as np
 
 def getuni(ACCESSION):
     ENTRY = UniprotkbClient.fetch_one(ACCESSION)
@@ -169,7 +170,10 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     if len(failed) > 0:
         print(">> Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
-            print("·· \""+ f + "\"\n")
+            if np.isnan(f):
+                print("·· empty cell\n")
+            else:
+                print("·· \""+ f + "\"\n")
 
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 

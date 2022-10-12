@@ -89,8 +89,8 @@ def argparse():
         help="Write the full results as a table ranked by iptm.")
 
     jobsetup_opts.add_option("--rankby",
-        action="store", dest="rankby", type="string", default="iptm", metavar='ptm-or-iptm',
-        help="Score by which models are ranked (ptm or iptm). Default is iptm. This is used for both choosing the best model in a prediction and then ranking the best models in the summaries.")
+        action="store", dest="rankby", type="string", default="pae", metavar='ptm-iptm-pae',
+        help="Score by which models are ranked (pae, ptm, or iptm). Default is pae. This is used for both choosing the best model in a prediction and then ranking the best models in the summaries.")
     
     analyze_opts.add_option("--overwrite",
         action="store_true", dest="overwrite", default=False,
