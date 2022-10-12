@@ -181,7 +181,8 @@ def getscores(rankby):
         
     df.sort_values(by=[rankby], ascending=False, ignore_index=True, inplace=True)
 
-    print("\n>> Warning: skipped " + str(skipped) + " since they were missing necessary files.")
+    if skipped > 0:
+        print("\n>> Warning: skipped " + str(skipped) + " since they were missing necessary files.")
 
     return(df)
 
