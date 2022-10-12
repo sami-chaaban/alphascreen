@@ -2,11 +2,13 @@
 
 ## Features
 
-* Gets sequences of uniprot IDs contained within a table with a list of paired proteins.
+* Gets the fasta sequences from uniprot IDs contained in a table of paired proteins.
 
 * Chops up the sequences so that they are of reasonable size for subsequent pairwise predictions.
 
-* Analyses the PAEs of the models only in the region relating to the protein-protein interaction of interest.
+* Interprets the PAEs of the models only in the region relating to the protein-protein interaction of interest.
+
+* Generates summary PDFs, including the PAE plot and snapshots of the models.
 
 ## Explanation
 
