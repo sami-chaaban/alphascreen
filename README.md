@@ -111,17 +111,17 @@ Name of column heading for uniprot IDs for the second set of interactors. Defaul
 
 ### Check runs<a name="checkruns"></a>
 
+* Check how many runs are finished so far and how many remain.
+
 ```
 alphascreen --check
 ```
 
-Checks how many runs are finished so far and how many remain.
+* Check how many runs are finished so far and write out a new bash script with the remaining Alphafold commands.
 
 ```
 alphascreen --write_unfinished
 ```
-
-Checks how many runs are finished so far and writes out a new bash script with the remaining Alphafold commands.
 
 ### Analysis<a name="analysis"></a>
 
