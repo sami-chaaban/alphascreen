@@ -1,6 +1,15 @@
 # alphascreen
 
-## Features
+1. [Features](#features)
+2. [Explanation](#explanation)
+3. [Installation](#installation)
+4. [Usage](#usage)
+    * [Job setup](#jobsetup)
+    * [Check runs](#checkruns)
+    * [Analysis](#analysis)
+5. [License](#license)
+
+## Features<a name="features"></a>
 
 * Gets the fasta sequences from uniprot IDs contained in a table of paired proteins.
 
@@ -9,13 +18,6 @@
 * Interprets the PAEs only in the region relating to the protein-protein interaction of interest.
 
 * Generates summaries, including a PDF showing the PAE plot next to snapshots of the models.
-
-1. [Explanation](#explanation)
-2. [Installation](#installation)
-3. [Usage](#usage)
-    * [Job setup](#jobsetup)
-    * [Check runs](#checkruns)
-    * [Analysis](#analysis)
 
 ## Explanation<a name="explanation"></a>
 
@@ -134,3 +136,7 @@ Score by which models are ranked (pae, iptm, or ptm). Default is pae. This is us
 **```--overwrite```**
 
 Overwrite snapshots that have already been generated, otherwise it will skip those to save time. This is only relevant for ``show_top``.
+
+## License<a name="license"></a>
+
+This project is licensed under the MIT License - see the [LICENSE.txt](https://github.com/sami-chaaban/alphascreen/blob/main/LICENSE.txt) file for details.
