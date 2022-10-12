@@ -35,7 +35,9 @@ The output is a bash script (*runpredictions.bsh*) that allows you to run Alphaf
 
 The default behaviour for analysis (```--show_top```) is to go through one result at a time and finding the best PAE plot, only considering the region corresponding to the protein interaction you are screening for, and choosing the best one. After doing this for all the predictions, they are ranked relative to each other by comparing their respective PAE plots in the protein interaction region, as before.
 
-If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/Colabfold implementation outputing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each containing the information in this format: *iptm:0.09 ptm:0.62* (these values are just an example).
+If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/Colabfold implementation outputing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
+
+*iptm:0.09 ptm:0.62*
 
 ## Installation<a name="installation"></a>
 
