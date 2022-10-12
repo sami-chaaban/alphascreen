@@ -27,9 +27,17 @@ Use this package to generate fastas for a set of interaction partners to run Alp
 
 The sequences are fetched from Uniprot and fragmented before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences helps keep the total sequence length short enough so the jobs don't run out of memory (```--fragment```). An overlap is considered so that the fragmentation doesn't accidentally cut into an interaction interface (```--overlap```). You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```dimerize_all_except```) and/or consider a specified sequence of a protein of interest (```--consider```).
 
+```
+alphascreen --parse myinteractions.xlsx
+```
+
 ### Running the predictions
 
 The output is a bash script (*runpredictions.bsh*) that allows you to run Alphafold on all the generated fasta files on your machine/cluster. The syntax is set up for the LMB cluster, and will therefore likely not correspond to what you use in your system. You can either edit *runpredictions.bsh* or *jobsetup.py* itself so that the Alphafold submission commands have the right syntax. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and therefore its file naming system. Be careful before running the script since it will submit all jobs and rely on your queuing system to handle the submissions.
+
+```
+bash runpredictions.bsh
+```
 
 ### Analyzing the results
 
@@ -40,6 +48,10 @@ If you want instead want to rank by iptm score, you can pass ```--rankby iptm```
 *iptm:0.09 ptm:0.62*
 
 These values are just an example. Note the presence/absence of spaces and placement of colons.
+
+```
+alphascreen --show_top 0.8
+```
 
 ## Installation<a name="installation"></a>
 
