@@ -15,7 +15,7 @@
 
 * Chops up the sequences so that they are of reasonable size for subsequent pairwise predictions.
 
-* Interprets the PAEs only in the region relating to the protein-protein interaction of interest.
+* Interprets the PAEs of the resulting predictions, only considering the region in the plot relating to the interaction.
 
 * Generates summaries, including a PDF showing the PAE plot next to snapshots of the models.
 
