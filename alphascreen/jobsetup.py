@@ -64,7 +64,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
 
     if consideruniprot != "":
-        print(">> Only considering " + str(considerstart+1) + "-" + str(considerend+1) + " for uniprot ID"+consideruniprot+"...\n")
+        print(">> Only considering " + str(considerstart+1) + "-" + str(considerend+1) + " for uniprot ID "+consideruniprot+"...\n")
     
     #remove duplicates
     repeating_indices = []
@@ -170,10 +170,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     if len(failed) > 0:
         print(">> Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
-            if np.isnan(f):
-                print("·· empty cell\n")
-            else:
-                print("·· \""+ f + "\"\n")
+            print("·· \""+ str(f) + "\"\n")
 
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 

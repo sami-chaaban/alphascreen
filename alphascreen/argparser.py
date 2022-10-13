@@ -18,10 +18,6 @@ def argparse():
         action="store", dest="table", type="string", default="", metavar='file',
         help="Path to the excel file (.xlsx) or table (.txt).")
 
-    jobsetup_opts.add_option("--focus",
-        action="store", dest="focus", type="string", default="", metavar='uniprot-id',
-        help="Uniprot ID to focus on. This means that it will the first chain in any predictions that contain it.")
-
     jobsetup_opts.add_option("--fragment",
         action="store", dest="fraglen", type="int", default=500, metavar='fragment-length',
         help="Approximate fragment length. Default is 500. For shorter fragments, try 250.")
@@ -46,10 +42,6 @@ def argparse():
         action="store", dest="consider", type="string", default="", metavar='sequence-to-consider',
         help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8.")
 
-    jobsetup_opts.add_option("--dontwrite",
-        action="store_true", dest="dontwrite", default=False,
-        help="Pass if you don't want to write out files.")
-
     jobsetup_opts.add_option("--alphafold_exec",
         action="store", dest="alphafold_exec", type="string", default="colabfold2", metavar='executable',
         help="Colabfold executable. Default is \"colabfold2\"")
@@ -61,6 +53,14 @@ def argparse():
     jobsetup_opts.add_option("--columnB",
         action="store", dest="columnB", type="string", default="SWISS-PROT Accessions Interactor B", metavar='columnB-name',
         help="Name of column heading for uniprot IDs for second interactors.")
+
+    jobsetup_opts.add_option("--focus",
+        action="store", dest="focus", type="string", default="", metavar='uniprot-id',
+        help="Uniprot ID to focus on. This means that it will the first chain in any predictions that contain it.")
+
+    jobsetup_opts.add_option("--dontwrite",
+        action="store_true", dest="dontwrite", default=False,
+        help="Pass if you don't want to write out files.")
     
     parser.add_option_group(jobsetup_opts)
 

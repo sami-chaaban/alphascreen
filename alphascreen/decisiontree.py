@@ -47,6 +47,23 @@ def decide():
     writetable = params['writetable']
     rankby = params['rankby']
 
+    if table != "":
+
+        with open("log.txt", 'w') as f:
+            f.write("Input: " + table + "\n")
+            f.write("Fragment: " + str(fraglen) + "\n")
+            f.write("Overlap: " + str(overlap) + "\n")
+            if dimerize:
+                f.write("Dimerized: " + dimerize + "\n")
+            elif dimerize_all:
+                f.write("Dimerized all proteins\n")
+            elif dimerize_except:
+                f.write("Dimerize all except: " + dimerize_except + "\n")
+            if consider != "":
+                f.write("Consider: " + consider + "\n")
+            f.write("Alphafold executable: " + alphafold_exec + "\n")
+
+
     ##################################
     #Parse input
 

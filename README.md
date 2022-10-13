@@ -23,9 +23,9 @@
 
 ### Setting up the fasta files
 
-Use this package to generate fastas for a set of interaction partners to run Alphafold predictions. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID).
+This package generates fasta files for a set of interaction partners in order to run Alphafold predictions. The assumption is that your Alphafold implementation takes fasta files as input. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID). Both .txt (as output by BioGRID) and .xlsx are acceptable.
 
-The sequences are fetched from Uniprot and fragmented before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences helps keep the total sequence length short enough so the jobs don't run out of memory (```--fragment```). An overlap is considered so that the fragmentation doesn't accidentally cut into an interaction interface (```--overlap```). You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```dimerize_all_except```) and/or consider a specified sequence of a protein of interest (```--consider```).
+The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. An overlap is considered (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```dimerize_all_except```) and/or consider a specific stretch of sequence for a protein of interest (```--consider```).
 
 ```
 alphascreen --parse myinteractions.xlsx
@@ -33,7 +33,9 @@ alphascreen --parse myinteractions.xlsx
 
 ### Running the predictions
 
-The output is a bash script (*runpredictions.bsh*) that allows you to run Alphafold on all the generated fasta files on your machine/cluster. The syntax is set up for the LMB cluster, and will therefore likely not correspond to what you use in your system. You can either edit *runpredictions.bsh* or *jobsetup.py* itself so that the Alphafold submission commands have the right syntax. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and therefore its file naming system. Be careful before running the script since it will submit all jobs and rely on your queuing system to handle the submissions.
+The output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and the filenames it generates.
+
+Important: The script will run all the jobs and relies on your queuing system to handle the submissions.
 
 ```
 bash runpredictions.bsh
@@ -41,13 +43,13 @@ bash runpredictions.bsh
 
 ### Analyzing the results
 
-The default behaviour for analysis (```--show_top```) is to go through one result at a time and finding the best PAE plot, only considering the region corresponding to the protein interaction you are screening for, and choosing the best one. After doing this for all the predictions, they are ranked relative to each other by comparing their respective PAE plots in the protein interaction region, as before.
+The default behaviour for analysis (```--show_top```) is to go through one result at a time and find the best PAE, only considering the region of the plot corresponding to the protein interaction you are screening for. After doing this for all the predictions, they are ranked relative to each other by again comparing their respective PAEs in the protein interaction region.
 
 ```
 alphascreen --show_top 0.8
 ```
 
-If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/Colabfold implementation outputing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
+If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/Colabfold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
 
 *iptm:0.09 ptm:0.62*
 
@@ -73,17 +75,13 @@ These values are just an example. Note the presence/absence of spaces and placem
 alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
 ```
 
-* If you have a list of potential interactors in two columns within a table. The file can be .txt (e.g. as output by Biogrid) or .xlsx.
+* If you have a list of potential interactors in two columns within a table (.txt or .xlsx):
 
 ```
 alphascreen --parse filename [options]
 ```
 
 **Options**
-
-**```--focus```** *```uniprot-id```*
-
-Uniprot ID to focus on. This means that it will the first chain in any predictions that contain it.
 
 **```--fragment```** *```length```*
 
@@ -120,6 +118,14 @@ Name of column heading for uniprot IDs for the first set of interactors. Default
 **```--columnB```** *```columnB-name```*
 
 Name of column heading for uniprot IDs for the second set of interactors. Default is *SWISS-PROT Accessions Interactor B*, which is just what BioGRID uses.
+
+**```--focus```** *```uniprot-id```*
+
+Uniprot ID to focus on. This means that it will the first chain in any predictions that contain it.
+
+**```--dontwrite```**
+
+Don't write out any files and just show the relevant information. This is useful to check how many fastas will be generated from parsing and fragmenting.
 
 ### Check runs<a name="checkruns"></a>
 
