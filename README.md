@@ -33,7 +33,7 @@ alphascreen --parse myproteinpairs.xlsx
 
 ### Running the predictions
 
-The output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and the filenames it generates (the names of the PDBs and PAE jsons are important to the result-parsing).
+The output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from Colabfold).
 
 Important: The script will run all the jobs and relies on your queuing system to handle them.
 
