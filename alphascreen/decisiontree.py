@@ -47,7 +47,7 @@ def decide():
     writetable = params['writetable']
     rankby = params['rankby']
 
-    if table != "":
+    if table != "" and not dontwrite:
 
         with open("log.txt", 'w') as f:
             f.write("Input: " + table + "\n")

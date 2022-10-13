@@ -25,7 +25,7 @@
 
 This package generates fasta files for a set of interaction partners in order to run Alphafold predictions. The assumption is that your Alphafold implementation takes fasta files as input. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID). Both .txt (as output by BioGRID) and .xlsx are acceptable.
 
-The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. An overlap is considered (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```dimerize_all_except```) and/or consider a specific stretch of sequence for a protein of interest (```--consider```).
+The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. An overlap is considered (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```--dimerize_all_except```) and/or consider a specific stretch of sequence for a protein of interest (```--consider```).
 
 ```
 alphascreen --parse myinteractions.xlsx
