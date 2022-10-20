@@ -66,6 +66,13 @@ def getscores(rankby):
                 skipped+=1
                 continue
 
+        modelnumlst = []
+        pdbpaths = []
+        for path in Path(resultdir).glob("*rank*.pdb"):
+            pdbpaths.append(str(path))
+            modelnum = str(path).split("model_")[-1].split(".pdb")[0].split("_")[0]
+            modelnumlst.append(int(modelnum)-1) #-1 is to turn it into index (0-4) since numbers are 1-5
+
         if os.path.exists(resultdir+"/scores.txt"):
             with open(resultdir+"/scores.txt") as f:
                 lines=f.readlines()
@@ -83,6 +90,7 @@ def getscores(rankby):
             next(Path(resultdir).glob("*PAE*.png"))
             for path in Path(resultdir).glob("*PAE*.png"):
                 paepng_lst.append(str(path))
+                break
         except StopIteration:
             paepng_lst.append("-")
         
@@ -92,13 +100,6 @@ def getscores(rankby):
         ProteinBmin=ProteinB.split("_")[0]+"_"+ProteinB.split("_")[1]
         proteinA_lst.append(ProteinA)
         proteinB_lst.append(ProteinB)
-
-        modelnumlst = []
-        pdbpaths = []
-        for path in Path(resultdir).glob("*rank*.pdb"):
-            pdbpaths.append(str(path))
-            modelnum = str(path).split("model_")[-1].split(".pdb")[0].split("_")[0]
-            modelnumlst.append(int(modelnum)-1) #-1 is to turn it into index (0-4) since numbers are 1-5
          
         paejsons=[]
         paenumlst=[]
@@ -451,10 +452,17 @@ def summarize_paeandmodel_pdf(df, threshold, rankby):
     with PdfPages(pdfname) as pdf:
         for i, result in df[df[rankby]>threshold].iterrows():
             
-            if rankby=="scaledPAE":
-                plottitle = [result["Model"],"iptm: "+str("{:.2f}".format(result["iptm"])),"ptm: "+str("{:.2f}".format(result["ptm"])),"minimum-pae: "+str("{:.2f}".format(result["minPAE"])),result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
+            if result["iptm"] == "-":
+                iptmstring = "-"
+                ptmstring = "-"
             else:
-                plottitle = [result["Model"],"iptm: "+str("{:.2f}".format(result["iptm"])),"ptm: "+str("{:.2f}".format(result["ptm"])),result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
+                iptmstring = str("{:.2f}".format(result["iptm"]))
+                ptmstring = str("{:.2f}".format(result["ptm"]))
+            
+            if rankby=="scaledPAE":
+                plottitle = [result["Model"],"iptm: "+ iptmstring + ", ptm: "+ ptmstring,"minimum-pae: "+str("{:.2f}".format(result["minPAE"])) + ", scaled-pae: "+str("{:.2f}".format(result["scaledPAE"])), result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
+            else:
+                plottitle = [result["Model"],"iptm: "+ iptmstring + ", ptm: "+ iptmstring, result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
             plottitle = "\n".join(plottitle)
             
             try:

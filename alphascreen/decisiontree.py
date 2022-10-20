@@ -94,10 +94,17 @@ def decide():
     if threshold != -1:
         print("\n>> Parsing results...")
         df = analyze.getscores(rankby)
+        
         if df.empty:
             sys.exit("\n>> Error: no results could be found.\n")
-        elif df[df[rankby]>threshold].empty:
+        try:
+            df[df[rankby]>threshold]
+        except TypeError:
+            sys.exit("\n>> Error: some values you want to rank by don't seem to exist. Did you try to rank by iptm without those scores existing?\n")
+
+        if df[df[rankby]>threshold].empty:
             sys.exit("\n>> Error: no results could be found with "+rankby+" above " + str(threshold) + ".\n")
+
         analyze.summarize_pae_pdf(df, threshold, rankby)
         analyze.write_top(df, threshold, rankby)
         analyze.write_modelpngs(df, threshold, rankby, overwrite=overwrite)

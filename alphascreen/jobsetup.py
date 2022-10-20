@@ -273,8 +273,8 @@ def findunfinished(alphafold_exec, write=True):
 
     if write:
         if len(colabfoldcommand) == 0:
-            sys.exit("\n>> There are no jobs left.")
+            sys.exit("\n>> There are no jobs left.\n")
         with open("runpredictions-unfinished.bsh", 'w') as f:
             for c in colabfoldcommand:
                 f.write(c)
-        print("\n>> Wrote runpredictions-unfinished.bsh")
+        print(">> Wrote runpredictions-unfinished.bsh\n")
