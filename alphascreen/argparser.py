@@ -26,6 +26,10 @@ def argparse():
         action="store", dest="overlap", type="int", default=50, metavar='overlap-length',
         help="Sequence is extended by this amount on either side of slices. Default is 50.")
 
+    jobsetup_opts.add_option("--exhaustive",
+        action="store_true", dest="exhaustive", default=False,
+        help="Run every protein in column A against every protein in column B.")
+
     jobsetup_opts.add_option("--dimerize",
         action="store", dest="dimerize", type="string", default="", metavar='dimerize-id',
         help="Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.")

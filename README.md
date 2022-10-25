@@ -35,7 +35,7 @@ alphascreen --parse myproteinpairs.xlsx
 
 The output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from Colabfold).
 
-Important: The script will run all the jobs and relies on your queuing system to handle them.
+Important: The script will run all the jobs and relies on your queuing system to handle them!
 
 ```
 bash runpredictions.bsh
@@ -46,7 +46,7 @@ bash runpredictions.bsh
 The default behaviour for analysis (```--show_top```) is to go through one result at a time and find the best PAE, only considering the region of the plot corresponding to the protein interaction you are screening for. After doing this for all the predictions, they are ranked relative to each other by again comparing their respective PAEs in the protein interaction region.
 
 ```
-alphascreen --show_top 0.8
+alphascreen --show_top 0.7
 ```
 
 If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/Colabfold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
@@ -91,13 +91,17 @@ Approximate fragment length. Default is 500.
 
 Sequence is extended by this amount on either side of slices. Default is 50.
 
+**```--exhaustive```**
+
+Run every protein in column A against every protein in column B, instead of just row by row.
+
 **```--dimerize```** *```uniprot-id```* or *```uniprot-ids.txt```*
 
 Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.
 
 **```--dimerize_all```**
 
-Dimerize all proteins.
+Dimerize all proteins. You may have to reduce the fragment length if the total sequence length becomes too big.
 
 **```--dimerize_all_except```** *```uniprot-ids.txt```*
 
@@ -135,11 +139,13 @@ Don't write out any files and just show the relevant information. This is useful
 alphascreen --check
 ```
 
-* Check how many runs are finished so far and write out a new bash script with the remaining Alphafold commands.
+* Check how many runs are finished so far and write out a new bash script with the remaining Alphafold commands (runpredictions-unfinished.bsh). This is useful when the jobs crash.
 
 ```
 alphascreen --write_unfinished
 ```
+
+Be careful not to run this while there are predictions in progress.
 
 ### Analysis<a name="analysis"></a>
 
@@ -147,7 +153,7 @@ alphascreen --write_unfinished
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.8``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. Only those with scaled PAEs higher than 0.8 are shown. See the ```--rankby``` option below for more information on the scaled PAE. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), and the .xlsx can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. Only those with scaled PAEs higher than 0.7 are shown. See the ```--rankby``` option below for more information on the scaled PAE. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), and the .xlsx can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
 
 ```
 alphascreen --write_table [options]
@@ -159,7 +165,7 @@ Like ```--show_top```, but only outputs the table (.xlsx and .csv). No threshold
 
 **```--rankby```** ```pae``` or ```iptm``` or ```ptm```
 
-Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.8``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm``` is a good starting point).
+Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.7``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm``` is a good starting point).
 
 **```--overwrite```**
 

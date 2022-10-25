@@ -46,6 +46,7 @@ def decide():
     overwrite = params['overwrite']
     writetable = params['writetable']
     rankby = params['rankby']
+    exhaustive = params['exhaustive']
 
     if table != "" and not dontwrite:
 
@@ -62,6 +63,8 @@ def decide():
             if consider != "":
                 f.write("Consider: " + consider + "\n")
             f.write("Alphafold executable: " + alphafold_exec + "\n")
+            if exhaustive:
+                f.write("Exhaustive = True.\n")
 
 
     ##################################
@@ -130,8 +133,8 @@ def decide():
             filetype = "excel"
 
         if filetype!="":
-            Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB, focus)
-        else:
+            Ainteractors, Binteractors = jobsetup.getinteractors(table, filetype, columnA, columnB, focus, exhaustive)
+        else: #if two proteins
             Ainteractors = [table.split("/")[0]]
             Binteractors = [table.split("/")[1]]
 

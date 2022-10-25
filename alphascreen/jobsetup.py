@@ -11,7 +11,7 @@ def getuni(ACCESSION):
     NAME = ENTRY['uniProtkbId']
     return(NAME, SEQ)
 
-def getinteractors(file,filetype, columnA, columnB, focus):
+def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
     
     print("\n>> Reading table...\n")
     if filetype == "table":
@@ -24,7 +24,7 @@ def getinteractors(file,filetype, columnA, columnB, focus):
 
     if focus != "":
         if focus not in Ainteractors or focus not in Binteractors:
-            print("!! Warning: the uniprot ID " + focus + " was not found.\n")
+            sys.exit("!! Error: the uniprot ID " + focus + " to focus on was not found.\n")
         Ainteractors_fixed = []
         Binteractors_fixed = []
         for A, B in zip(Ainteractors,Binteractors):
@@ -34,9 +34,22 @@ def getinteractors(file,filetype, columnA, columnB, focus):
             else:
                 Ainteractors_fixed.append(A)
                 Binteractors_fixed.append(B)
-        return(Ainteractors_fixed, Binteractors_fixed)
-    else:
-        return(Ainteractors, Binteractors)
+        Ainteractors = Ainteractors_fixed
+        Binteractors = Binteractors_fixed
+
+    if exhaustive:
+        Ainteractors = list(set(Ainteractors))
+        Binteractors = list(set(Binteractors))
+        Ainteractors_exh = []
+        Binteractors_exh = []
+        for A in Ainteractors:
+            for B in Binteractors:
+                Ainteractors_exh.append(A)
+                Binteractors_exh.append(B)
+        Ainteractors = Ainteractors_exh
+        Binteractors = Binteractors_exh
+
+    return(Ainteractors, Binteractors)
 
 def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
     
@@ -91,8 +104,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     colabfoldcommand = []
     unilst = []
-    Anamefail = []
-    Bnamefail = []
+    failed = []
 
     if len(dontdimerizelst) != 0:
         alluniprots = list(set(list(Ainteractors+Binteractors)))
@@ -100,17 +112,37 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     print(">> Getting sequences...\n")
 
+    Unis_found = []
+    Names_found = []
+    Seqs_found = []
+
     for A, B in zip(Ainteractors, Binteractors):
 
         try:
-            Aname,Aseq=getuni(A)
+            if A in Unis_found:
+                Aindex = Unis_found.index(A)
+                Aname = Names_found[Aindex]
+                Aseq = Seqs_found[Aindex]
+            else:
+                Aname,Aseq=getuni(A)
+                Unis_found.append(A)
+                Names_found.append(Aname)
+                Seqs_found.append(Aseq)
         except:
-            Anamefail.append(A)
+            failed.append(A)
             continue
         try:
-            Bname,Bseq=getuni(B)
+            if B in Unis_found:
+                Bindex = Unis_found.index(B)
+                Bname = Names_found[Bindex]
+                Bseq = Seqs_found[Bindex]
+            else:
+                Bname,Bseq=getuni(B)
+                Unis_found.append(B)
+                Names_found.append(Bname)
+                Seqs_found.append(Bseq)
         except:
-            Anamefail.append(B)
+            failed.append(B)
             continue
             
         unilst.append(A + ":" + Aname)
@@ -165,9 +197,9 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                             f.write(">"+Bn+"\n"+Bs+"\n")
 
                 colabfoldcommand.append(alphafold_exec + " " + fastaname_minimal + " --output=results/" + An + "-" + Bn)
-    
-    failed = Anamefail + Bnamefail
+
     if len(failed) > 0:
+        failed = list(set(failed))
         print(">> Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
             print("·· \""+ str(f) + "\"\n")
