@@ -50,6 +50,18 @@ def decide():
     exhaustive = params['exhaustive']
     showall = params['showall']
 
+    if fraglen == "":
+        fraguniprot = 0
+        fraglen = 500
+    elif len(fraglen.split("/")) == 2:
+        if len(table.split("/")) != 2:
+            sys.exit("\n>> Error: You provided two fragment lengths but the input was not two uniprot IDs.\n")
+        fraguniprot = [table.split("/")[0], table.split("/")[1]]
+        fraglen = [int(fraglen.split("/")[0]), int(fraglen.split("/")[1])]
+    else:
+        fraguniprot = 0
+        fraglen = int(fraglen)
+
     if table != "" and not dontwrite:
 
         with open("log.txt", 'w') as f:
@@ -156,7 +168,7 @@ def decide():
             Binteractors = [table.split("/")[1]]
             print("\n>> Parsing " + Ainteractors[0] + " and " + Binteractors[0] + "...\n")
 
-        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
+        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraguniprot=fraguniprot,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
 
     ##################################
 

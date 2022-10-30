@@ -51,7 +51,7 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
 
     return(Ainteractors, Binteractors)
 
-def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
+def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraguniprot=0,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
     
     dimerizelst = []
     dontdimerizelst = []
@@ -170,17 +170,34 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                     notconsidered.remove(B) 
         
         if split:
-            #print(Aname)
-            Anamelst, Aseqlst = splitfasta(Aname,Aseq,fraglen,overlap,addmeA)
-            #print(Bname)
-            Bnamelst, Bseqlst = splitfasta(Bname,Bseq,fraglen,overlap,addmeB)
+
+            if type(fraglen) == list:
+                if A in fraguniprot:
+                    fraglen_cur=fraglen[fraguniprot.index(A)]
+                else:
+                    fraglen_cur = 500
+            else:
+                fraglen_cur = fraglen
+
+            Anamelst, Aseqlst = splitfasta(Aname,Aseq,fraglen_cur,overlap,addmeA)
+
+            if type(fraglen) == list:
+                if B in fraguniprot:
+                    fraglen_cur=fraglen[fraguniprot.index(B)]
+                else:
+                    fraglen_cur = 500
+            else:
+                fraglen_cur = fraglen
+
+            Bnamelst, Bseqlst = splitfasta(Bname,Bseq,fraglen_cur,overlap,addmeB)
+
         else:
+
             Anamelst = [Aname]
             Aseqlst = [Aseq]
             Bnamelst = [Bname]
             Bseqlst = [Bseq]
             
-        #print(Anamelst, Aseqlst)
         
         for An, As in zip(Anamelst, Aseqlst):
             

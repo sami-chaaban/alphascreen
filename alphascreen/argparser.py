@@ -19,7 +19,7 @@ def argparse():
         help="Path to the excel file (.xlsx) or table (.txt).")
 
     jobsetup_opts.add_option("--fragment",
-        action="store", dest="fraglen", type="int", default=500, metavar='fragment-length',
+        action="store", dest="fraglen", type="string", default="", metavar='fragment-length',
         help="Approximate fragment length. Default is 500. For shorter fragments, try 250.")
 
     jobsetup_opts.add_option("--overlap",
