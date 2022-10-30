@@ -474,7 +474,7 @@ def summarize_paeandmodel_pdf(df, threshold, rankby):
                     sys.exit("\n>> Could not interpret the PAE json file.\n")
 
             fig = plt.figure(figsize=(60,20))
-            fig.suptitle(plottitle, fontsize=28)
+            fig.suptitle(plottitle, fontsize=30)
             plt.subplot(1, 3, 1)
             make_paeplot(pae, protnames, protlens)
             plt.xticks(fontsize=36)

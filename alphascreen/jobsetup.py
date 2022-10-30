@@ -53,8 +53,6 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
 
 def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
     
-    #print("\nStarting...\n")
-    
     dimerizelst = []
     dontdimerizelst = []
 
@@ -75,10 +73,6 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             dimerizelst = [dimerize]
             print(">> Dimerizing uniprot ID " + dimerize + "...\n")
 
-
-    if consideruniprot != "":
-        print(">> Only considering " + str(considerstart+1) + "-" + str(considerend+1) + " for uniprot ID "+consideruniprot+"...\n")
-    
     #remove duplicates
     repeating_indices = []
     for i, pair in enumerate(zip(Ainteractors, Binteractors)):
@@ -92,15 +86,15 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     Ainteractors = [j for i, j in enumerate(Ainteractors) if i not in repeating_indices]
     Binteractors = [j for i, j in enumerate(Binteractors) if i not in repeating_indices]
     
-    print(">> Removed " + str(len(repeating_indices)) + " duplicates...\n")
+    if len(Ainteractors) > 1 and len(Binteractors) > 1:
+        print(">> Removed " + str(len(repeating_indices)) + " duplicates...\n")
     
     os.makedirs('fastas', exist_ok=True)
     os.makedirs('results', exist_ok=True)
 
     for fname in os.listdir('fastas'):
         if fname.endswith('.fasta'):
-            print("!! Warning: it looks like fasta files already exist in the fastas folder.\n")
-            break
+            sys.exit(">> Error: it looks like fasta files already exist in the fastas folder.\n")
 
     colabfoldcommand = []
     unilst = []
@@ -116,6 +110,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     Names_found = []
     Seqs_found = []
 
+    notconsidered = consideruniprot #fully populated and will be removed one by one to check that all were found
     for A, B in zip(Ainteractors, Binteractors):
 
         try:
@@ -150,17 +145,29 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
         addmeA=0
         addmeB=0
-        if consideruniprot != "":
-            if consideruniprot == A:
-                if considerend > len(Aseq):
-                    sys.exit(">> Error: last amino acid to consider is outside the protein length. Maximum is " + str(len(Aseq)+1) + "\n")
-                Aseq = Aseq[considerstart:considerend]
-                addmeA = considerstart
-            if consideruniprot == B:
-                if considerend > len(Bseq):
-                    sys.exit(">> Error: last amino acid to consider is outside the protein length. Maximum is " + str(len(Bseq)+1) + "\n")
-                Bseq = Bseq[considerstart:considerend]
-                addmeB = considerstart
+        if len(consideruniprot) > 0:
+
+            if A in consideruniprot:
+
+                a = consideruniprot.index(A)
+                if considerend[a] > len(Aseq):
+                    sys.exit(">> Error: last amino acid to consider is outside the protein length for " + consideruniprot[a] + ". Maximum is " + str(len(Aseq)+1) + ".\n")
+                Aseq = Aseq[considerstart[a]:considerend[a]]
+                addmeA = considerstart[a]
+
+                if A in notconsidered:
+                    notconsidered.remove(A) 
+
+            if B in consideruniprot:
+
+                b = consideruniprot.index(B)
+                if considerend[b] > len(Bseq):
+                    sys.exit(">> Error: last amino acid to consider is outside the protein length for " + consideruniprot[b] + ". Maximum is " + str(len(Bseq)+1) + ".\n")
+                Bseq = Bseq[considerstart[b]:considerend[b]]
+                addmeB = considerstart[b]
+
+                if B in notconsidered:
+                    notconsidered.remove(B) 
         
         if split:
             #print(Aname)
@@ -200,9 +207,13 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     if len(failed) > 0:
         failed = list(set(failed))
-        print(">> Warning: there was a problem getting the Uniprot data for accessions:\n")
+        print("!! Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
             print("·· \""+ str(f) + "\"\n")
+
+    if len(notconsidered) > 0:
+        for c in notconsidered:
+            print("!! Warning: you asked to consider a region within " + c + ", but it wasn't in your input.\n")
 
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 
@@ -285,7 +296,7 @@ def findunfinished(alphafold_exec, write=True):
         resultdir = "results" + str(fastapath).split("fastas")[1][:-6]
 
         if not os.path.exists(resultdir) and not warned:
-            print("\n>> Warning: could not find one of the directories. Make sure this the right directory where the Alphafold jobs were run.")
+            print("\n!! Warning: could not find one of the directories. Make sure this the right directory where the Alphafold jobs were run.")
             warned=True
         
         found = False

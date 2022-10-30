@@ -44,7 +44,7 @@ def argparse():
 
     jobsetup_opts.add_option("--consider",
         action="store", dest="consider", type="string", default="", metavar='sequence-to-consider',
-        help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8.")
+        help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (id/start/end).")
 
     jobsetup_opts.add_option("--alphafold_exec",
         action="store", dest="alphafold_exec", type="string", default="colabfold2", metavar='executable',
@@ -87,6 +87,10 @@ def argparse():
     analyze_opts.add_option("--show_top",
         action="store", dest="threshold", type="float", default=-1, metavar="threshold",
         help="Summarize results for top hits (above the threshold specified here) in tables and pdfs.")
+
+    analyze_opts.add_option("--show_all",
+        action="store_true", dest="showall", default=False,
+        help="Summarize results for all hits in tables and pdfs.")
 
     analyze_opts.add_option("--write_table",
         action="store_true", dest="writetable", default=False,

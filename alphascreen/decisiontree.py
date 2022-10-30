@@ -12,6 +12,7 @@ from pymol import cmd
 import cv2 as cv
 import sys
 
+import alphascreen
 from alphascreen import argparser
 from alphascreen import jobsetup
 from alphascreen import analyze
@@ -47,10 +48,12 @@ def decide():
     writetable = params['writetable']
     rankby = params['rankby']
     exhaustive = params['exhaustive']
+    showall = params['showall']
 
     if table != "" and not dontwrite:
 
         with open("log.txt", 'w') as f:
+            f.write("AlphaScreen version: " + str(alphascreen.__version__) + "\n")
             f.write("Input: " + table + "\n")
             f.write("Fragment: " + str(fraglen) + "\n")
             f.write("Overlap: " + str(overlap) + "\n")
@@ -84,6 +87,9 @@ def decide():
     if rankby=="pae":
         rankby="scaledPAE"
 
+    if showall:
+        threshold = 0
+
     ##################################
 
     if writetable:
@@ -116,14 +122,25 @@ def decide():
 
     ##################################
 
-    consideruniprot, considerstart, considerend = ["", "", ""]
+    consideruniprot, considerstart, considerend = [], [], []
     if consider != "":
-        considerargs = consider.split("/")
-        if len(considerargs) != 3:
-            sys.exit("\n>> Error: the --consider argument was not passed properly.\n")
-        consideruniprot = considerargs[0]
-        considerstart = int(considerargs[1])-1
-        considerend = int(considerargs[2])-1
+        if consider[-4:] == ".txt":
+            with open(consider) as f:
+                considerlist=[line.strip() for line in f.readlines()]
+            for c in considerlist:
+                considerargs = c.split("/")
+                if len(considerargs) != 3:
+                    sys.exit("\n>> Error: there is a problem with the line " + c + " in " + consider + ".\n")
+                consideruniprot.append(considerargs[0])
+                considerstart.append(int(considerargs[1])-1)
+                considerend.append(int(considerargs[2])-1)
+        else:
+            considerargs = consider.split("/")
+            if len(considerargs) != 3:
+                sys.exit("\n>> Error: the --consider argument was not passed properly.\n")
+            consideruniprot = [considerargs[0]]
+            considerstart = [int(considerargs[1])-1]
+            considerend = [int(considerargs[2])-1]
 
     filetype=""
     if table != "":
@@ -137,6 +154,7 @@ def decide():
         else: #if two proteins
             Ainteractors = [table.split("/")[0]]
             Binteractors = [table.split("/")[1]]
+            print("\n>> Parsing " + Ainteractors[0] + " and " + Binteractors[0] + "...\n")
 
         jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
 

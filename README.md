@@ -107,9 +107,9 @@ Dimerize all proteins. You may have to reduce the fragment length if the total s
 
 Provide a text file (.txt) with a single column list of uniprot IDs to NOT dimerize. Everything else will be dimerized.
 
-**```--consider```** *```uniprot/start/end```*
+**```--consider```** *```uniprot/start/end```* or *```consider.txt```*
 
-Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only considers amino acids 1-200 for uniprot ID Q86VS8.
+Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (id/start/end).
 
 **```--alphafold_exec```** *```alphafold-executable```*
 
@@ -153,7 +153,7 @@ Be careful not to run this while there are predictions in progress.
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will rank predictions by interaction-site PAEs to choose the highest rank, then lists those predictions, ranking by the interaction-site PAE. Only those with scaled PAEs higher than 0.7 are shown. See the ```--rankby``` option below for more information on the scaled PAE. To output all predictions, pass ```--show_top 0```. A table is output (.xlsx and .csv), and the .xlsx can be used as input for a subsequent run of alphascreen if you need to test dimerization or use different alphafold executable on the top hits.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then list all the predictions (also ranked by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are shown. See the ```--rankby``` option description below for more information on the scaled-PAE. To output all predictions, pass ```--show_all```. In all cases, a table is output that can be used as input for a subsequent run of alphascreen if you need to test dimerization or use a different alphafold executable on the top hits.
 
 ```
 alphascreen --write_table [options]
