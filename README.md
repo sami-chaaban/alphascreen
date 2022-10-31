@@ -103,9 +103,9 @@ Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single 
 
 Dimerize all proteins. You may have to reduce the fragment length if the total sequence length becomes too big.
 
-**```--dimerize_all_except```** *```uniprot-ids.txt```*
+**```--dimerize_all_except```** *```uniprot-id```* or *```uniprot-ids.txt```*
 
-Provide a text file (.txt) with a single column list of uniprot IDs to NOT dimerize. Everything else will be dimerized.
+Dimerize all proteins except the uniprot ID provided here. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to NOT dimerize. Everything else will be dimerized.
 
 **```--consider```** *```uniprot/start/end```* or *```consider.txt```*
 

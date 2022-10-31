@@ -362,6 +362,8 @@ def summarize_pae_pdf(df, threshold, rankby):
 
 def write_top(df, threshold, rankby):
     
+    print("\n>> Writing " + excelname + " and " + csvname)
+
     if threshold == 0:
         basename = "Results"
     else:
@@ -374,15 +376,13 @@ def write_top(df, threshold, rankby):
         df[df[rankby]>threshold].to_excel(writer)
         
     df.to_csv(csvname)
-    
-    print("\n>> Wrote " + excelname + " and " + csvname)
         
         
 def write_modelpngs(df, threshold, rankby, overwrite=False):
 
     print("\n>> Writing model snapshots...")
 
-    pymol.finish_launching(['pymol', '-qc']) #-Q will suppress render outputs too
+    pymol.finish_launching(['pymol', '-qc']) #-Q will suppress render outputs too if you want
 
     total=0
 
@@ -426,8 +426,6 @@ def write_modelpngs(df, threshold, rankby, overwrite=False):
         cmd.delete("current")
         
         total+=1
-        
-    #print("\n>> Wrote png-snapshots for " + str(total) + " pdbs.")
         
 def waitfor(filename):
     pngexists=False

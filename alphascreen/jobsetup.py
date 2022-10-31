@@ -22,6 +22,9 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
     Ainteractors = table[columnA].tolist()
     Binteractors = table[columnB].tolist()
 
+    Ainteractors = [s.strip() for s in Ainteractors]
+    Binteractors = [s.strip() for s in Binteractors]
+
     if focus != "":
         if focus not in Ainteractors or focus not in Binteractors:
             sys.exit("!! Error: the uniprot ID " + focus + " to focus on was not found.\n")
@@ -60,9 +63,13 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
         print(">> Dimerizing all proteins...\n")
 
     elif dimerize_except:
-        print(">> Dimerizing all proteins except those in " + dimerize_except + "...\n")
-        with open(dimerize_except) as f:
-            dontdimerizelst=[line.strip() for line in f.readlines()]
+        if dimerize_except[-4:] == ".txt":
+            print(">> Dimerizing all proteins except those in " + dimerize_except + "...\n")
+            with open(dimerize_except) as f:
+                dontdimerizelst=[line.strip() for line in f.readlines()]
+        else:
+            dontdimerzelst = [dimerize_except]
+            print(">> Dimerizing all proteins except " + dimerize_except + "...\n")
 
     elif dimerize != "":
         if dimerize[-4:] == ".txt":
@@ -110,7 +117,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     Names_found = []
     Seqs_found = []
 
-    notconsidered = consideruniprot #fully populated and will be removed one by one to check that all were found
+    notconsidered = consideruniprot.copy() #fully populated and will be removed one by one to check that all were found
     for A, B in zip(Ainteractors, Binteractors):
 
         try:
