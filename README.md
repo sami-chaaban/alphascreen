@@ -83,6 +83,14 @@ alphascreen --parse filename [options]
 
 **Options**
 
+**```--columnA```** *```columnA-name```*
+
+Name of column heading for uniprot IDs for the first set of interactors. Default is *SWISS-PROT Accessions Interactor A*, which is what BioGRID uses.
+
+**```--columnB```** *```columnB-name```*
+
+Name of column heading for uniprot IDs for the second set of interactors. Default is *SWISS-PROT Accessions Interactor B*, which is what BioGRID uses.
+
 **```--fragment```** *```length```*
 
 Approximate fragment length. Default is 500. If you provided two uniprot IDs as input, you have the option to provide two fragment lengths here (*length1/length2*) corresponding to the fragment length of each uniprot ID.
@@ -114,14 +122,6 @@ Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only consider
 **```--alphafold_exec```** *```alphafold-executable```*
 
 Path to script that runs Alphafold for writing the commands. Default is *colabfold2* as per the LMB cluster usage.
-
-**```--columnA```** *```columnA-name```*
-
-Name of column heading for uniprot IDs for the first set of interactors. Default is *SWISS-PROT Accessions Interactor A*, which is just what BioGRID uses.
-
-**```--columnB```** *```columnB-name```*
-
-Name of column heading for uniprot IDs for the second set of interactors. Default is *SWISS-PROT Accessions Interactor B*, which is just what BioGRID uses.
 
 **```--focus```** *```uniprot-id```*
 
