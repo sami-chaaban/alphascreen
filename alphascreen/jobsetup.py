@@ -75,7 +75,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             with open(dimerize_except) as f:
                 dontdimerizelst=[line.strip() for line in f.readlines()]
         else:
-            dontdimerzelst = [dimerize_except]
+            dontdimerizelst = [dimerize_except]
             print(">> Dimerizing all proteins except " + dimerize_except + "...\n")
 
     elif dimerize != "":
@@ -244,7 +244,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     if len(notconsidered) > 0:
         for c in notconsidered:
-            print("!! Warning: you asked to consider a region within " + c + ", but it wasn't in your input.\n")
+            print("!! Warning: you asked to consider a region within " + c + ", but this ID wasn't in your input.\n")
 
     colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
 
