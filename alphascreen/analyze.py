@@ -361,8 +361,6 @@ def summarize_pae_pdf(df, threshold, rankby):
 #     return view
 
 def write_top(df, threshold, rankby):
-    
-    print("\n>> Writing " + excelname + " and " + csvname)
 
     if threshold == 0:
         basename = "Results"
@@ -371,6 +369,8 @@ def write_top(df, threshold, rankby):
         
     excelname = basename + ".xlsx"
     csvname = basename + ".csv"
+
+    print("\n>> Writing " + excelname + " and " + csvname)
     
     with pd.ExcelWriter(excelname) as writer:  
         df[df[rankby]>threshold].to_excel(writer)

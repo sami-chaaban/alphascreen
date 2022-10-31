@@ -22,6 +22,13 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
     Ainteractors = table[columnA].tolist()
     Binteractors = table[columnB].tolist()
 
+    #cleanup
+    if exhaustive:
+        Ainteractors = [x for x in Ainteractors if x == x] #remove nan float which result from empty cells
+        Binteractors = [x for x in Binteractors if x == x]
+    else:
+        Ainteractors = ["empty-cell" if x != x else x for x in Ainteractors] #replace nan-float with 0, which result from empty cells
+        Binteractors = ["empty-cell" if x != x else x for x in Binteractors]
     Ainteractors = [s.strip() for s in Ainteractors]
     Binteractors = [s.strip() for s in Binteractors]
 
@@ -233,7 +240,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
         failed = list(set(failed))
         print("!! Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
-            print("·· \""+ str(f) + "\"\n")
+            print("·· "+ str(f) + "\n")
 
     if len(notconsidered) > 0:
         for c in notconsidered:
