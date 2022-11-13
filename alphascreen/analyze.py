@@ -137,9 +137,21 @@ def getscores(rankby):
                 m = np.argmax(ptms)
         elif rankby=="scaledPAE":
             minpaes=[]
-            for paejson in paejsons:
-                minpaes.append(getmincrosspae(paejson))
-            m = paenumlst[np.argmin(minpaes)]
+            rankfile = resultdir+"/bestpaerank.txt"
+            if os.path.exists(rankfile):
+                with open(rankfile) as f:
+                    lines = [line for line in f.readlines()]
+                m = int(lines[-1].split(":")[-1])-1
+                minpaes = [line.strip() for line in lines[:-1]]
+                minpaes = [float(i) for i in minpaes]                   
+            else:
+                with open(rankfile, 'w') as f:
+                    for paejson in paejsons:
+                        minpae = getmincrosspae(paejson)
+                        minpaes.append(minpae)
+                        f.write(str(minpae)+"\n")
+                    m = paenumlst[np.argmin(minpaes)]
+                    f.write("bestrank:"+str(m+1))
             # For the future: if same crosspae, choose best iptm
             # if len([k for k in minpaes if k == min(minpaes)]) > 1:
             #     print("there are multiple solutions for " + str(scorepath))

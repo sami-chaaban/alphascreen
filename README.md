@@ -7,7 +7,8 @@
     * [Job setup](#jobsetup)
     * [Check runs](#checkruns)
     * [Analysis](#analysis)
-5. [License](#license)
+5. [Troubleshooting](#troubleshooting)
+6. [License](#license)
 
 ## Features<a name="features"></a>
 
@@ -170,6 +171,10 @@ Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The defa
 **```--overwrite```**
 
 Overwrite snapshots that have already been generated, otherwise it will skip those to save time. This is only relevant for ``show_top``.
+
+## Troubleshooting<a name="troubleshooting"></a>
+
+* If a "license expired" watermark appears on the model images in PAEs-Models.pdf, follow the instructions here to update your pymol license: https://pymol.org/dsc/ip/license/. You may have to be on your institute's VPN for the link to direct you to a download page rather than an invoice verification page.
 
 ## License<a name="license"></a>
 

@@ -87,21 +87,23 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             dimerizelst = [dimerize]
             print(">> Dimerizing uniprot ID " + dimerize + "...\n")
 
-    #remove duplicates
+    #remove exact duplicates
+    rawtotal = len(Ainteractors)
+    Ainteractors, Binteractors = zip(*list(dict.fromkeys(zip(Ainteractors, Binteractors))))
+    
+    #remove reversed duplicates
     repeating_indices = []
     for i, pair in enumerate(zip(Ainteractors, Binteractors)):
         for j, pair_same in enumerate(zip(Ainteractors, Binteractors)):
-            if pair[0] == pair_same[0] and pair[1] == pair_same[1] and i != j: #i != j means that one instance is retained
-                repeating_indices.append(j)
-                #print(pair[0], pair[1], pair_same[0], pair_same[1])
-            if pair[0] == pair_same[1] and pair[1] == pair_same[0]:
+            if pair[0] == pair_same[1] and pair[1] == pair_same[0] and j > i:
                 repeating_indices.append(j)
                 #print(pair[0], pair[1], pair_same[0], pair_same[1])
     Ainteractors = [j for i, j in enumerate(Ainteractors) if i not in repeating_indices]
     Binteractors = [j for i, j in enumerate(Binteractors) if i not in repeating_indices]
-    
+
+    numremoved = rawtotal - len(Ainteractors)
     if len(Ainteractors) > 1 and len(Binteractors) > 1:
-        print(">> Removed " + str(len(repeating_indices)) + " duplicates...\n")
+        print(">> Removed " + str(numremoved) + " duplicates...\n")
     
     os.makedirs('fastas', exist_ok=True)
     os.makedirs('results', exist_ok=True)
@@ -327,7 +329,7 @@ def findunfinished(alphafold_exec, write=True):
         resultdir = "results" + str(fastapath).split("fastas")[1][:-6]
 
         if not os.path.exists(resultdir) and not warned:
-            print("\n!! Warning: could not find one of the directories. Make sure this the right directory where the Alphafold jobs were run.")
+            print("\n!! Warning: could not match one or more fasta files with its result folder.\n!! Wait for any running jobs to finish, then run alphascreen --write_unfinished.")
             warned=True
         
         found = False
