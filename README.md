@@ -102,7 +102,11 @@ Sequence is extended by this amount on either side of slices. Default is 50.
 
 **```--exhaustive```**
 
-Run every protein in column A against every protein in column B, instead of just row by row. This is useful when you want to run everything in a list of proteins against each other. In this case, create a table with two columns both containing the list of proteins, and use the *--exhaustive* option. Any duplicate pairs will be removed during parsing.
+Run every protein in column A against every protein in column B, instead of just row by row. This is useful when you want to run everything in a list of proteins against each other. In this case, create a table with two columns both containing the list of proteins, and use the *--exhaustive* option. Any duplicate pairs will be removed during parsing. To ignore proteins being predicted against themselves, use *--ignore_self*.
+
+**```--ignore_self```**
+
+Ignore any instances of a protein being predicted against itself. Useful when using the *--exhaustive* option with two identical columns of proteins to predict everything against everything while ignoring self.
 
 **```--dimerize```** *```uniprot-id```* or *```uniprot-ids.txt```*
 

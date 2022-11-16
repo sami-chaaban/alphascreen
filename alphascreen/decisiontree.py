@@ -49,6 +49,7 @@ def decide():
     rankby = params['rankby']
     exhaustive = params['exhaustive']
     showall = params['showall']
+    ignoreself = params['ignoreself']
 
     if fraglen == "":
         fraguniprot = 0
@@ -80,6 +81,8 @@ def decide():
             f.write("Alphafold executable: " + alphafold_exec + "\n")
             if exhaustive:
                 f.write("Exhaustive = True.\n")
+            if ignoreself:
+                f.write("Ignore self = True.\n")
 
 
     ##################################
@@ -168,7 +171,7 @@ def decide():
             Binteractors = [table.split("/")[1]]
             print("\n>> Parsing " + Ainteractors[0] + " and " + Binteractors[0] + "...\n")
 
-        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraguniprot=fraguniprot,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec)
+        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraguniprot=fraguniprot,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec, ignoreself=ignoreself)
 
     ##################################
 

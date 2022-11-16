@@ -30,6 +30,10 @@ def argparse():
         action="store_true", dest="exhaustive", default=False,
         help="Run every protein in column A against every protein in column B.")
 
+    jobsetup_opts.add_option("--ignore_self",
+        action="store_true", dest="ignoreself", default=False,
+        help="Ignore any instances where both proteins are the same.")
+
     jobsetup_opts.add_option("--dimerize",
         action="store", dest="dimerize", type="string", default="", metavar='dimerize-id',
         help="Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.")

@@ -61,7 +61,7 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
 
     return(Ainteractors, Binteractors)
 
-def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraguniprot=0,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2"):
+def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraguniprot=0,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2",ignoreself=False):
     
     dimerizelst = []
     dontdimerizelst = []
@@ -101,10 +101,23 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     Ainteractors = [j for i, j in enumerate(Ainteractors) if i not in repeating_indices]
     Binteractors = [j for i, j in enumerate(Binteractors) if i not in repeating_indices]
 
-    numremoved = rawtotal - len(Ainteractors)
+    newtotal = len(Ainteractors)
+    numremoved = rawtotal - newtotal
     if len(Ainteractors) > 1 and len(Binteractors) > 1:
         print(">> Removed " + str(numremoved) + " duplicates...\n")
-    
+
+    #remove self
+    if ignoreself:  
+        self_indices = []
+        for i, pair in enumerate(zip(Ainteractors, Binteractors)):
+            if pair[0] == pair[1]:
+                self_indices.append(i)
+        Ainteractors = [j for i, j in enumerate(Ainteractors) if i not in self_indices]
+        Binteractors = [j for i, j in enumerate(Binteractors) if i not in self_indices]
+        numremoved = newtotal - len(Ainteractors)
+        if len(Ainteractors) > 1 and len(Binteractors) > 1:
+            print(">> Removed " + str(numremoved) + " identical pairs...\n")
+
     os.makedirs('fastas', exist_ok=True)
     os.makedirs('results', exist_ok=True)
 
