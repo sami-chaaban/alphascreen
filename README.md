@@ -102,11 +102,11 @@ Sequence is extended by this amount on either side of slices. Default is 50.
 
 **```--exhaustive```**
 
-Run every protein in column A against every protein in column B, instead of just row by row.
+Run every protein in column A against every protein in column B, instead of just row by row. This is useful when you want to run everything in a list of proteins against each other. In this case, create a table with two columns both containing the list of proteins, and use the *--exhaustive* option. Any duplicate pairs will be removed during parsing.
 
 **```--dimerize```** *```uniprot-id```* or *```uniprot-ids.txt```*
 
-Uniprot ID to dimerize. Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.
+Uniprot ID to dimerize (i.e. homodimerize). Alternatively, provide a text file (.txt) with a single column list of uniprot IDs to dimerize.
 
 **```--dimerize_all```**
 
@@ -154,7 +154,11 @@ Be careful not to run this while there are predictions in progress.
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then list all the predictions (also ranked by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are shown. See the ```--rankby``` option description below for more information on the scaled-PAE. To output all predictions, pass ```--show_all```. In all cases, a table is also output that can be used as input for a subsequent run of alphascreen if you need to test dimerization or use a different alphafold executable on the top hits.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then rank all the predictions (also by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are output to a pdf. The ```--rankby``` option below has more information on the scaled-PAE.
+
+The PAEs-Models pdf will also contain a snapshot of the prediction (see troubleshooting below if you get a "license" watermark on the models). A table is also output (.xlsx) that can be used as input for a subsequent run of alphascreen if you need to test different parameters on just the top hits.
+
+To output all predictions, pass ```--show_all```.  
 
 ```
 alphascreen --write_table [options]
@@ -170,7 +174,7 @@ Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The defa
 
 **```--overwrite```**
 
-Overwrite snapshots that have already been generated, otherwise it will skip those to save time. This is only relevant for ``show_top``.
+Overwrite .png snapshots that have already been generated, otherwise it will skip those to save time. This is only relevant for ``show_top``.
 
 ## Troubleshooting<a name="troubleshooting"></a>
 
