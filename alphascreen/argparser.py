@@ -51,8 +51,8 @@ def argparse():
         help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (id/start/end).")
 
     jobsetup_opts.add_option("--alphafold_exec",
-        action="store", dest="alphafold_exec", type="string", default="colabfold2", metavar='executable',
-        help="Colabfold executable. Default is \"colabfold2\"")
+        action="store", dest="alphafold_exec", type="string", default="colabfold4", metavar='executable',
+        help="Colabfold executable. Default is \"colabfold4\"")
 
     jobsetup_opts.add_option("--columnA",
         action="store", dest="columnA", type="string", default="SWISS-PROT Accessions Interactor A", metavar='columnA-name',

@@ -126,7 +126,7 @@ Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only consider
 
 **```--alphafold_exec```** *```alphafold-executable```*
 
-Path to script that runs Alphafold for writing the commands. Default is *colabfold2* as per the LMB cluster usage.
+Path to script that runs Alphafold for writing the commands. Default is *colabfold4* as per the LMB cluster usage.
 
 **```--focus```** *```uniprot-id```*
 

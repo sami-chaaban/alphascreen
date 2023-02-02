@@ -104,7 +104,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
     newtotal = len(Ainteractors)
     numremoved = rawtotal - newtotal
     if len(Ainteractors) > 1 and len(Binteractors) > 1:
-        print(">> Removed " + str(numremoved) + " duplicates...\n")
+        print(">> Removed " + str(numremoved) + " duplicated pairs...\n")
 
     #remove self
     if ignoreself:  
@@ -116,7 +116,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
         Binteractors = [j for i, j in enumerate(Binteractors) if i not in self_indices]
         numremoved = newtotal - len(Ainteractors)
         if len(Ainteractors) > 1 and len(Binteractors) > 1:
-            print(">> Removed " + str(numremoved) + " identical pairs...\n")
+            print(">> Removed " + str(numremoved) + " pairs where the proteins are the same...\n")
 
     os.makedirs('fastas', exist_ok=True)
     os.makedirs('results', exist_ok=True)
@@ -348,7 +348,7 @@ def findunfinished(alphafold_exec, write=True):
         found = False
         if os.path.exists(resultdir):
             for fname in os.listdir(resultdir):
-                if fname.endswith('.pdb'):
+                if fname.endswith('.pdb') and len(fname.split("rank")) == 2:
                     found = True
                     numfound+=1
                     break

@@ -106,7 +106,7 @@ def getscores(rankby):
         if scorewildcard == "_scores.json":
             for path in Path(resultdir).glob("*_model_*_scores.json"):
                 paejsons.append(str(path))
-                paenumlst.append(int(str(path).split("_scores.json")[0].split("_model_")[-1])-1)
+                paenumlst.append(int(str(path).split("_scores.json")[0].split("_model_")[-1].split("seed")[0])-1)
         elif scorewildcard == "_pae.json":
             for path in Path(resultdir).glob("rank_*_model_*_ptm_seed_0_pae.json"):
                 paejsons.append(str(path))
@@ -143,15 +143,15 @@ def getscores(rankby):
                     lines = [line for line in f.readlines()]
                 m = int(lines[-1].split(":")[-1])-1
                 minpaes = [line.strip() for line in lines[:-1]]
-                minpaes = [float(i) for i in minpaes]                   
+                minpaes = [float(i.split("=")[-1]) for i in minpaes]                   
             else:
                 with open(rankfile, 'w') as f:
-                    for paejson in paejsons:
+                    for paenum, paejson in zip(paenumlst, paejsons):
                         minpae = getmincrosspae(paejson)
                         minpaes.append(minpae)
-                        f.write(str(minpae)+"\n")
+                        f.write("model"+str(paenum+1)+"="+str(minpae)+"\n")
                     m = paenumlst[np.argmin(minpaes)]
-                    f.write("bestrank:"+str(m+1))
+                    f.write("bestmodel:"+str(m+1))
             # For the future: if same crosspae, choose best iptm
             # if len([k for k in minpaes if k == min(minpaes)]) > 1:
             #     print("there are multiple solutions for " + str(scorepath))
