@@ -106,7 +106,7 @@ def getscores(rankby):
         if scorewildcard == "_scores.json":
             for path in Path(resultdir).glob("*_model_*_scores.json"):
                 paejsons.append(str(path))
-                paenumlst.append(int(str(path).split("_scores.json")[0].split("_model_")[-1].split("seed")[0])-1)
+                paenumlst.append(int(str(path).split("_scores.json")[0].split("_model_")[-1].split("_seed")[0])-1)
         elif scorewildcard == "_pae.json":
             for path in Path(resultdir).glob("rank_*_model_*_ptm_seed_0_pae.json"):
                 paejsons.append(str(path))
