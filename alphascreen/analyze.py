@@ -130,21 +130,26 @@ def getscores(rankby):
                 print("Could not find uniprot ID for " + ProteinBmin)
 
 
+        foundflag=False
         if rankby in ["iptm", "ptm"]:
             if rankby == "iptm":
                 m = np.argmax(iptms)
             else:
                 m = np.argmax(ptms)
+
         elif rankby=="scaledPAE":
             minpaes=[]
             rankfile = resultdir+"/bestpaerank.txt"
-            if os.path.exists(rankfile):
+            if os.path.exists(rankfile) and os.stat(rankfile).st_size != 0:
                 with open(rankfile) as f:
                     lines = [line for line in f.readlines()]
-                m = int(lines[-1].split(":")[-1])-1
-                minpaes = [line.strip() for line in lines[:-1]]
-                minpaes = [float(i.split("=")[-1]) for i in minpaes]                   
-            else:
+                if ":" in lines[-1]:
+                    m = int(lines[-1].split(":")[-1])-1
+                    minpaes = [line.strip() for line in lines[:-1]]
+                    minpaes = [float(i.split("=")[-1]) for i in minpaes]                   
+                    foundflag=True
+
+            if not foundflag:
                 with open(rankfile, 'w') as f:
                     for paenum, paejson in zip(paenumlst, paejsons):
                         minpae = getmincrosspae(paejson)
@@ -155,6 +160,7 @@ def getscores(rankby):
             # For the future: if same crosspae, choose best iptm
             # if len([k for k in minpaes if k == min(minpaes)]) > 1:
             #     print("there are multiple solutions for " + str(scorepath))
+        
         else:
             sys.exit("\n>> Provide ptm, iptm, or pae as the ranking method.\n")
 
