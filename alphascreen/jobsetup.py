@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import sys
 import numpy as np
+from Bio import SeqIO
 
 def getuni(ACCESSION):
     ENTRY = UniprotkbClient.fetch_one(ACCESSION)
@@ -61,7 +62,7 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
 
     return(Ainteractors, Binteractors)
 
-def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, split=True,fraguniprot=0,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2",ignoreself=False):
+def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, customids, split=True,fraguniprot=0,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2",ignoreself=False):
     
     dimerizelst = []
     dontdimerizelst = []
@@ -135,6 +136,14 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     print(">> Getting sequences...\n")
 
+    customid_names = []
+    customid_seqs = []
+    if customids != "":
+        with open(customids, mode='r') as handle:
+             for record in SeqIO.parse(handle, 'fasta'):
+                    customid_names.append(record.id)
+                    customid_seqs.append(str(record.seq))
+
     Unis_found = []
     Names_found = []
     Seqs_found = []
@@ -148,7 +157,12 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                 Aname = Names_found[Aindex]
                 Aseq = Seqs_found[Aindex]
             else:
-                Aname,Aseq=getuni(A)
+                if A in customid_names:
+                    Aindex = customid_names.index(A)
+                    Aname = customid_names[Aindex]
+                    Aseq = customid_seqs[Aindex]
+                else:
+                    Aname,Aseq=getuni(A)
                 Unis_found.append(A)
                 Names_found.append(Aname)
                 Seqs_found.append(Aseq)
@@ -161,7 +175,12 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                 Bname = Names_found[Bindex]
                 Bseq = Seqs_found[Bindex]
             else:
-                Bname,Bseq=getuni(B)
+                if B in customid_names:
+                    Bindex = customid_names.index(B)
+                    Bname = customid_names[Bindex]
+                    Bseq = customid_seqs[Bindex]
+                else:
+                    Bname,Bseq=getuni(B)
                 Unis_found.append(B)
                 Names_found.append(Bname)
                 Seqs_found.append(Bseq)

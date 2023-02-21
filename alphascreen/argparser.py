@@ -50,6 +50,10 @@ def argparse():
         action="store", dest="consider", type="string", default="", metavar='sequence-to-consider',
         help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (id/start/end).")
 
+    jobsetup_opts.add_option("--customids",
+        action="store", dest="customids", type="string", default="", metavar='custom-ids',
+        help="Provide a fasta file to define custom IDs that you will use when running --parse. This is useful when your sequence is not present in uniprot database. The fasta file can contain multiple entries. Make sure the headers don't contain any dashes and have at most one underscore")
+
     jobsetup_opts.add_option("--alphafold_exec",
         action="store", dest="alphafold_exec", type="string", default="colabfold4", metavar='executable',
         help="Colabfold executable. Default is \"colabfold4\"")

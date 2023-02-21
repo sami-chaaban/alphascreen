@@ -50,6 +50,7 @@ def decide():
     exhaustive = params['exhaustive']
     showall = params['showall']
     ignoreself = params['ignoreself']
+    customids = params['customids']
 
     if fraglen == "":
         fraguniprot = 0
@@ -78,6 +79,8 @@ def decide():
                 f.write("Dimerize all except: " + dimerize_except + "\n")
             if consider != "":
                 f.write("Consider: " + consider + "\n")
+            if customids != "":
+                f.write("Custom IDs: " + customids + "\n")
             f.write("Alphafold executable: " + alphafold_exec + "\n")
             if exhaustive:
                 f.write("Exhaustive = True.\n")
@@ -171,7 +174,7 @@ def decide():
             Binteractors = [table.split("/")[1]]
             print("\n>> Parsing " + Ainteractors[0] + " and " + Binteractors[0] + "...\n")
 
-        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, split=True,fraguniprot=fraguniprot,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec, ignoreself=ignoreself)
+        jobsetup.getfastas_writecommands(Ainteractors, Binteractors, consideruniprot, considerstart, considerend, customids, split=True,fraguniprot=fraguniprot,fraglen=fraglen,overlap=overlap,dimerize=dimerize,dimerize_all=dimerize_all,dimerize_except=dimerize_except,write=towrite,alphafold_exec=alphafold_exec, ignoreself=ignoreself)
 
     ##################################
 

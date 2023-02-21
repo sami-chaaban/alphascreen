@@ -21,6 +21,6 @@ setup(name='alphascreen',
             "alphascreen = alphascreen.__main__:main",
             ],
       },
-      install_requires=["pandas","unipressed", "matplotlib", "numpy", "opencv-python", "openpyxl"],
+      install_requires=["pandas","unipressed", "matplotlib", "numpy", "opencv-python", "openpyxl", "biopython"],
       python_requires='>=3.8'
      )

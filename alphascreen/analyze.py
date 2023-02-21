@@ -96,8 +96,14 @@ def getscores(rankby):
         
         ProteinA=resultname.split("-")[0]
         ProteinB=resultname.split("-")[1]
-        ProteinAmin=ProteinA.split("_")[0]+"_"+ProteinA.split("_")[1]
-        ProteinBmin=ProteinB.split("_")[0]+"_"+ProteinB.split("_")[1]
+
+        if len(ProteinA.split("_")) == 4: #Those from uniprot have "NAME_HUMAN_1_100" or similar
+            ProteinAmin=ProteinA.split("_")[0]+"_"+ProteinA.split("_")[1]
+            ProteinBmin=ProteinB.split("_")[0]+"_"+ProteinB.split("_")[1]
+        else: #not from uniprot
+            ProteinAmin=ProteinA.split("_")[0]
+            ProteinBmin=ProteinB.split("_")[0]
+
         proteinA_lst.append(ProteinA)
         proteinB_lst.append(ProteinB)
          
@@ -212,7 +218,10 @@ def make_paeplot(pae, protnames, protlens):
     yticklocs = []
     newprotnames = []
     for i, p in enumerate(protnames):
-        newprotnames.append(p.split("_")[0]+"\n"+p.split("_")[2]+"-"+p.split("_")[3])
+        if p.split("_") == 4: #Those from uniprot have "NAME_HUMAN_1_100" or similar
+            newprotnames.append(p.split("_")[0]+"\n"+p.split("_")[2]+"-"+p.split("_")[3])
+        else:
+            newprotnames.append(p.split("_")[0]+"\n"+p.split("_")[1]+"-"+p.split("_")[2])
         
     for n, l in zip(protnames, protlens):
         

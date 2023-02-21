@@ -24,9 +24,9 @@
 
 ### Setting up the fasta files
 
-This package generates fasta files for a set of interaction partners in order to run Alphafold predictions. The assumption is that your Alphafold implementation takes fasta files as input. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID). Acceptable extensions are .xlsx and .txt (tab-delimited, e.g. as output by BioGRID).
+This package generates fasta files for a set of interaction partners in order to run Alphafold predictions. The assumption is that your Alphafold implementation takes fasta files as input. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (column headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID). Acceptable extensions are .xlsx and .txt (tab-delimited, e.g. as output by BioGRID).
 
-The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. An overlap is considered (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```--dimerize_all_except```) and/or consider a specific stretch of sequence for a protein of interest (```--consider```).
+The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. An overlap is considered (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```--dimerize_all_except```) and/or consider a specific stretch of sequence for a protein or set of proteins (```--consider```).
 
 ```
 alphascreen --parse myproteinpairs.xlsx
@@ -34,7 +34,7 @@ alphascreen --parse myproteinpairs.xlsx
 
 ### Running the predictions
 
-The output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from Colabfold).
+One of the files that is output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and 1.4.0 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from Colabfold).
 
 Important: The script will run all the jobs and relies on your queuing system to handle them!
 
@@ -123,6 +123,10 @@ Dimerize all proteins except the uniprot ID provided here. Alternatively, provid
 **```--consider```** *```uniprot/start/end```* or *```consider.txt```*
 
 Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (*id/start/end*).
+
+**```--customids```** *```sequences.fasta```*
+
+Provide a fasta file to define custom IDs that you will use when running *--parse*. This is useful when your sequence is not present in uniprot database. The fasta file can contain multiple entries. Make sure the headers don't contain any dashes and have at most one underscore (working examples: *>ProteinA* or *>ProteinA_Tetrahymena*).
 
 **```--alphafold_exec```** *```alphafold-executable```*
 
