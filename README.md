@@ -132,7 +132,7 @@ Sequence is extended by this amount on either side of slices. Default is 50.
 
 Run every protein in column A against every protein in column B, instead of just row by row. This is useful when you want to run everything in a list of proteins against each other, or one protein against many (see example of the latter below). In this case, create a table with two columns both containing the list of proteins, and use the *--exhaustive* option. Any duplicate pairs will be removed during parsing. To ignore proteins being predicted against themselves, use *--ignore_self*.
 
-![ExhaustiveExample](https://github.com/sami-chaaban/alphascreen/blob/main/examples/Exhaustive.png?raw=true "ExhaustiveExample")
+<img src="https://github.com/sami-chaaban/alphascreen/blob/main/examples/Exhaustive.png"  alt="ExhaustiveExample" width="60%" height="60%">
 
 **```--ignore_self```**
 
