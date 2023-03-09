@@ -70,17 +70,45 @@ These values are just an example. Note the presence/absence of spaces and placem
 
 ### Job setup<a name="jobsetup"></a>
 
-* If you have two large proteins and want to generate fragmented predictions:
-
-```
-alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
-```
-
 * If you have a list of potential interactors in two columns within a table (.txt or .xlsx):
 
 ```
 alphascreen --parse filename [options]
 ```
+
+For example, the tab delimited Biogrid output *BIOGRID-GENE-111808-4.4.214.tab3.txt* looks like this:
+
+![BiogridExample](https://github.com/sami-chaaban/alphascreen/blob/main/examples/Biogrid.png?raw=true "BiogridExample")
+
+To parse the file, run `alphascreen --parse BIOGRID-GENE-111808-4.4.214.tab3.txt`. The script will generate the following output:
+
+```
+>> Reading table...
+
+>> Removed 45 duplicated pairs...
+
+>> Getting sequences...
+
+!! Warning: there was a problem getting the Uniprot data for accessions:
+
+·· -
+
+>> Writing 157 Alphafold commands...
+
+>> Run the Alphafold jobs with "bash runpredictions.bsh"
+
+Done!
+
+```
+
+Sometimes, the uniprot IDs are invalid from the table, such as the dash ("-") referenced in the warning, which could not be interpreted. The script will generate two folders (***results*** and ***fastas***), some general information files (***log.txt*** and ***uniprots.txt***), and finally the bash script to run the predictions (***runpredictions.bsh***). See the options below for additional options, such as dimerization, custom sequences, etc.
+
+* If you only have two proteins and want to generate fragmented predictions, you can simply run:
+
+```
+alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
+```
+
 
 **Options**
 
@@ -102,7 +130,9 @@ Sequence is extended by this amount on either side of slices. Default is 50.
 
 **```--exhaustive```**
 
-Run every protein in column A against every protein in column B, instead of just row by row. This is useful when you want to run everything in a list of proteins against each other. In this case, create a table with two columns both containing the list of proteins, and use the *--exhaustive* option. Any duplicate pairs will be removed during parsing. To ignore proteins being predicted against themselves, use *--ignore_self*.
+Run every protein in column A against every protein in column B, instead of just row by row. This is useful when you want to run everything in a list of proteins against each other, or one protein against many (see example of the latter below). In this case, create a table with two columns both containing the list of proteins, and use the *--exhaustive* option. Any duplicate pairs will be removed during parsing. To ignore proteins being predicted against themselves, use *--ignore_self*.
+
+![ExhaustiveExample](https://github.com/sami-chaaban/alphascreen/blob/main/examples/Exhaustive.png?raw=true "ExhaustiveExample")
 
 **```--ignore_self```**
 
@@ -142,17 +172,17 @@ Don't write out any files and just show the relevant information. This is useful
 
 ### Check runs<a name="checkruns"></a>
 
-* Check how many runs are finished so far and how many remain.
-
 ```
 alphascreen --check
 ```
 
-* Check how many runs are finished so far and write out a new bash script with the remaining Alphafold commands (runpredictions-unfinished.bsh). This is useful when the jobs crash.
+Check how many runs are finished so far and how many remain.
 
 ```
 alphascreen --write_unfinished
 ```
+
+Check how many runs are finished so far and write out a new bash script with the remaining Alphafold commands (runpredictions-unfinished.bsh). This is useful when the jobs crash.
 
 Be careful not to run this while there are predictions in progress.
 
@@ -162,11 +192,9 @@ Be careful not to run this while there are predictions in progress.
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then rank all the predictions (also by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are output to a pdf. The ```--rankby``` option below has more information on the scaled-PAE.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then rank all the predictions (also by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are output to a pdf. The ```--rankby``` option below has more information on the scaled-PAE. To output all predictions, pass ```--show_all```. The PAEs-Models pdf will also contain a snapshot of the prediction (see troubleshooting below if you get a "license" watermark on the models). A table is also output (.xlsx) that can be used as input for a subsequent run of alphascreen if you need to test different parameters on just the top hits.
 
-The PAEs-Models pdf will also contain a snapshot of the prediction (see troubleshooting below if you get a "license" watermark on the models). A table is also output (.xlsx) that can be used as input for a subsequent run of alphascreen if you need to test different parameters on just the top hits.
-
-To output all predictions, pass ```--show_all```.  
+![AnalysisExample](https://github.com/sami-chaaban/alphascreen/blob/main/examples/Analysis.png?raw=true "AnalysisExample")
 
 ```
 alphascreen --write_table [options]
