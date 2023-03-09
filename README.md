@@ -194,6 +194,8 @@ alphascreen --show_top threshold [options]
 
 Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then rank all the predictions (also by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are output to a pdf. The ```--rankby``` option below has more information on the scaled-PAE. To output all predictions, pass ```--show_all```. The PAEs-Models pdf will also contain a snapshot of the prediction (see troubleshooting below if you get a "license" watermark on the models). A table is also output (.xlsx) that can be used as input for a subsequent run of alphascreen if you need to test different parameters on just the top hits.
 
+Here is an example of one page from the PAEs-Models pdf:
+
 ![AnalysisExample](https://github.com/sami-chaaban/alphascreen/blob/main/examples/Analysis.png?raw=true "AnalysisExample")
 
 ```
