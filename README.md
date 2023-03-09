@@ -1,7 +1,7 @@
 # alphascreen
 
 1. [Features](#features)
-2. [Workflow](#workflow)
+2. [Workflow Overview](#workflow)
 3. [Installation](#installation)
 4. [Usage](#usage)
     * [Job setup](#jobsetup)
@@ -20,7 +20,7 @@
 
 * Generates summaries, including a PDF showing the PAE plot next to snapshots of the models.
 
-## Workflow<a name="workflow"></a>
+## Workflow Overview<a name="workflow"></a>
 
 ### Setting up the fasta files
 
