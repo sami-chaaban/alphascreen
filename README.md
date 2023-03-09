@@ -70,7 +70,7 @@ These values are just an example. Note the presence/absence of spaces and placem
 
 ### Job setup<a name="jobsetup"></a>
 
-* If you have a list of potential interactors in two columns within a table (.txt or .xlsx):
+If you have a list of potential interactors in two columns within a table (.txt or .xlsx):
 
 ```
 alphascreen --parse filename [options]
@@ -103,7 +103,7 @@ Done!
 
 Sometimes, the uniprot IDs are invalid from the table, such as the dash ("-") referenced in the warning, which could not be interpreted. The script will generate two folders (***results*** and ***fastas***), some general information files (***log.txt*** and ***uniprots.txt***), and finally the bash script to run the predictions (***runpredictions.bsh***). See the options below for additional options, such as dimerization, custom sequences, etc.
 
-* If you only have two proteins and want to generate fragmented predictions, you can simply run:
+If you only have two proteins and want to generate fragmented predictions, you can simply run:
 
 ```
 alphascreen --parse uniprot-id-1/uniprot-id-2 [options]
