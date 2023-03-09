@@ -33,8 +33,20 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
     Ainteractors = [s.strip() for s in Ainteractors]
     Binteractors = [s.strip() for s in Binteractors]
 
+    if exhaustive:
+        Ainteractors = list(set(Ainteractors))
+        Binteractors = list(set(Binteractors))
+        Ainteractors_exh = []
+        Binteractors_exh = []
+        for A in Ainteractors:
+            for B in Binteractors:
+                Ainteractors_exh.append(A)
+                Binteractors_exh.append(B)
+        Ainteractors = Ainteractors_exh
+        Binteractors = Binteractors_exh
+
     if focus != "":
-        if focus not in Ainteractors or focus not in Binteractors:
+        if focus not in Ainteractors and focus not in Binteractors:
             sys.exit("!! Error: the uniprot ID " + focus + " to focus on was not found.\n")
         Ainteractors_fixed = []
         Binteractors_fixed = []
@@ -47,18 +59,6 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
                 Binteractors_fixed.append(B)
         Ainteractors = Ainteractors_fixed
         Binteractors = Binteractors_fixed
-
-    if exhaustive:
-        Ainteractors = list(set(Ainteractors))
-        Binteractors = list(set(Binteractors))
-        Ainteractors_exh = []
-        Binteractors_exh = []
-        for A in Ainteractors:
-            for B in Binteractors:
-                Ainteractors_exh.append(A)
-                Binteractors_exh.append(B)
-        Ainteractors = Ainteractors_exh
-        Binteractors = Binteractors_exh
 
     return(Ainteractors, Binteractors)
 
@@ -119,8 +119,9 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
         if len(Ainteractors) > 1 and len(Binteractors) > 1:
             print(">> Removed " + str(numremoved) + " pairs where the proteins are the same...\n")
 
-    os.makedirs('fastas', exist_ok=True)
-    os.makedirs('results', exist_ok=True)
+    if write:
+        os.makedirs('fastas', exist_ok=True)
+        os.makedirs('results', exist_ok=True)
 
     for fname in os.listdir('fastas'):
         if fname.endswith('.fasta'):
