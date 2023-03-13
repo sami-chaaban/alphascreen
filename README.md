@@ -101,7 +101,7 @@ Done!
 
 ```
 
-Sometimes the uniprot ID is invalid, such as the dash ("-") referenced in the warning above. When finished, the script will have generated two folders (***results*** and ***fastas***), some general information files (***log.txt*** and ***uniprots.txt***), and the bash script to run the predictions (***runpredictions.bsh***). See the options below for additional options, such as dimerization, custom sequences, etc.
+Sometimes the uniprot ID is invalid, such as the dash ("-") referenced in the warning above. When finished, the script will have generated two folders (***fastas*** and ***results***), some general information files (***log.txt*** and ***uniprots.txt***), and the bash script to run the predictions (***runpredictions.bsh***). See below for additional options, such as dimerization, custom sequences, etc.
 
 If you only have two proteins and want to generate fragmented predictions, you can simply run:
 
