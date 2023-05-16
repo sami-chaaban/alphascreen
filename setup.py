@@ -9,7 +9,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(name='alphascreen',
       version=alphascreen.__version__,
-      description='Use colabfold to screen protein-protein interactions.',
+      description='Streamlined preparation and analysis of AlphaFold protein-protein interactions.',
       author='Sami Chaaban',
       author_email='chaaban@mrc-lmb.cam.ac.uk',
       url='http://pypi.python.org/pypi/alphascreen/',
