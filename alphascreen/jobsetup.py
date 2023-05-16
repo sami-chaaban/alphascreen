@@ -81,12 +81,12 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
     elif dimerize != "":
         if dimerize[-4:] == ".txt":
-            print(">> Dimerizing uniprot IDs in " + dimerize + "...\n")
+            print(">> Dimerizing IDs in " + dimerize + "...\n")
             with open(dimerize) as f:
                 dimerizelst=[line.strip() for line in f.readlines()]
         else:
             dimerizelst = [dimerize]
-            print(">> Dimerizing uniprot ID " + dimerize + "...\n")
+            print(">> Dimerizing " + dimerize + "...\n")
 
     #remove exact duplicates
     rawtotal = len(Ainteractors)

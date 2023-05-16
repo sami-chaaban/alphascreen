@@ -22,6 +22,8 @@
 
 ## Workflow Overview<a name="workflow"></a>
 
+For a step-by-step workflow, see the [Usage](#usage) section.
+
 ### Setting up the fasta files
 
 This package generates fasta files for a set of interaction partners in order to run Alphafold predictions. The assumption is that your Alphafold implementation takes fasta files as input. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (column headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID). Acceptable extensions are .xlsx and .txt (tab-delimited, e.g. as output by BioGRID).
@@ -136,7 +138,7 @@ Run every protein in column A against every protein in column B, instead of just
 
 **```--ignore_self```**
 
-Ignore any instances of a protein being predicted against itself. Useful when using the *--exhaustive* option with two identical columns of proteins to predict everything against everything while ignoring self.
+Ignore any instances of a protein being predicted against itself. Useful when using the *--exhaustive* option with two identical columns of proteins to predict everything against everything while ignoring self. This does not include dimerization.
 
 **```--dimerize```** *```uniprot-id```* or *```uniprot-ids.txt```*
 
@@ -208,7 +210,7 @@ Like ```--show_top```, but only outputs the table (.xlsx and .csv). No threshold
 
 **```--rankby```** ```pae``` or ```iptm``` or ```ptm```
 
-Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.7``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--show_top 0.3 --rankby iptm``` is a good starting point).
+Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.7``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--rankby iptm --show_top 0.3``` is a good starting point).
 
 **```--overwrite```**
 
