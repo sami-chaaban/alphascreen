@@ -36,7 +36,7 @@ alphascreen --parse myproteinpairs.xlsx
 
 ### Running the predictions
 
-One of the files that is output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0 and 1.4.0 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from Colabfold).
+One of the files that is output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on ColabFold 1.3.0, 1.4.0, and 1.5.2 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from ColabFold).
 
 Important: The script will run all the jobs and relies on your queuing system to handle them!
 
@@ -52,7 +52,7 @@ The default behaviour for analysis (```--show_top```) is to go through one resul
 alphascreen --show_top 0.7
 ```
 
-If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/Colabfold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
+If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/ColabFold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
 
 *iptm:0.09 ptm:0.62*
 
