@@ -62,9 +62,13 @@ def getscores(rankby):
                 next(Path(resultdir).glob("*_pae.json"))
                 scorewildcard="_pae.json"
             except StopIteration:
-                print("\n>> Warning: skipping " + resultname + " since it is missing the scores json files.")
-                skipped+=1
-                continue
+                try:
+                    next(Path(resultdir).glob("*predicted_aligned_error_v1.json"))
+                    scorewildcard="predicted_aligned_error_v1.json"
+                except StopIteration:
+                    print("\n>> Warning: skipping " + resultname + " since it is missing the scores json files.")
+                    skipped+=1
+                    continue
 
         modelnumlst = []
         pdbpaths = []
@@ -119,6 +123,10 @@ def getscores(rankby):
             for path in Path(resultdir).glob("rank_*_model_*_ptm_seed_0_pae.json"):
                 paejsons.append(str(path))
                 paenumlst.append(int(str(path).split("_ptm_seed_0_pae.json")[0].split("_model_")[-1])-1)
+        elif scorewildcard == "predicted_aligned_error_v1.json":
+            for path in Path(resultdir).glob("*_rank_*_model_*_seed_000.json"):
+                paejsons.append(str(path))
+                paenumlst.append(int(str(path).split("_seed_000.json")[0].split("_model_")[-1])-1)
         
         if existuniprot:
             foundA=False
