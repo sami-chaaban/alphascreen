@@ -1,4 +1,5 @@
 import json
+import matplotlib
 import matplotlib.pyplot as plt
 from pathlib import Path
 import numpy as np
@@ -13,6 +14,7 @@ import sys
 import time
 import pymol
 import math
+matplotlib.use('Agg')
 
 def getscores(rankby):
 
