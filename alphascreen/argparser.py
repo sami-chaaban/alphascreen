@@ -55,8 +55,8 @@ def argparse():
         help="Provide a fasta file to define custom IDs that you will use when running --parse. This is useful when your sequence is not present in uniprot database. The fasta file can contain multiple entries. Make sure the headers don't contain any dashes and have at most one underscore")
 
     jobsetup_opts.add_option("--alphafold_exec",
-        action="store", dest="alphafold_exec", type="string", default="colabfold4", metavar='executable',
-        help="Colabfold executable. Default is \"colabfold4\"")
+        action="store", dest="alphafold_exec", type="string", default="colabfold5", metavar='executable',
+        help="Colabfold executable. Default is \"colabfold5\"")
 
     jobsetup_opts.add_option("--columnA",
         action="store", dest="columnA", type="string", default="SWISS-PROT Accessions Interactor A", metavar='columnA-name',

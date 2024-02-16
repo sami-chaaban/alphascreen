@@ -162,7 +162,7 @@ Provide a fasta file to define custom IDs that you will use when running *--pars
 
 **```--alphafold_exec```** *```alphafold-executable```*
 
-Path to script that runs Alphafold for writing the commands. Default is *colabfold4* as per the LMB cluster usage.
+Path to script that runs Alphafold for writing the commands. Default is *colabfold5* as per the LMB cluster usage.
 
 **```--focus```** *```uniprot-id```*
 
