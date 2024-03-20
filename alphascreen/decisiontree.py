@@ -46,7 +46,7 @@ def decide():
     threshold = params['threshold']
     overwrite = params['overwrite']
     writetable = params['writetable']
-    rankby = params['rankby']
+    rankby = params['rank_by']
     exhaustive = params['exhaustive']
     showall = params['showall']
     ignoreself = params['ignoreself']

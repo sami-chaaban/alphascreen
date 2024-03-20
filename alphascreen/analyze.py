@@ -26,6 +26,7 @@ def getscores(rankby):
     ptmhighscore_lst = []
     mincrosspae_lst = []
     inv_mincrosspae_lst = []
+    lislst_lst = []
     pdbname_lst = []
     paepng_lst = []
     paejson_lst = []
@@ -178,9 +179,30 @@ def getscores(rankby):
             # For the future: if same crosspae, choose best iptm
             # if len([k for k in minpaes if k == min(minpaes)]) > 1:
             #     print("there are multiple solutions for " + str(scorepath))
-        
+
+        elif rankby=="lis":
+            lislst=[]
+            rankfile = resultdir+"/bestlisrank.txt"
+            if os.path.exists(rankfile) and os.stat(rankfile).st_size != 0:
+                with open(rankfile) as f:
+                    lines = [line for line in f.readlines()]
+                if ":" in lines[-1]:
+                    m = int(lines[-1].split(":")[-1])-1
+                    lislst = [line.strip() for line in lines[:-1]]
+                    lislst = [float(i.split("=")[-1]) for i in lislst]                   
+                    foundflag=True
+
+            if not foundflag:
+                with open(rankfile, 'w') as f:
+                    for paenum, paejson in zip(paenumlst, paejsons):
+                        lis = get_lis(paejson, 12.0)
+                        lislst.append(lis)
+                        f.write("model"+str(paenum+1)+"="+str(lis)+"\n")
+                    m = paenumlst[np.argmax(lislst)]
+                    f.write("bestmodel:"+str(m+1))
+
         else:
-            sys.exit("\n>> Provide ptm, iptm, or pae as the ranking method.\n")
+            sys.exit("\n>> Provide lis, ptm, iptm, or pae as the ranking method.\n")
 
         iptmhighscore_lst.append(iptms[m])
         ptmhighscore_lst.append(ptms[m])
@@ -192,6 +214,11 @@ def getscores(rankby):
         else:
             mincrosspae_lst.append("-")
             inv_mincrosspae_lst.append("-")
+
+        if rankby=="lis":
+            lislst_lst.append(lislst[paenumlst.index(m)])
+        else:
+            mincrosspae_lst.append("-")
 
         pdbname = pdbpaths[modelnumlst.index(m)]
         pdbname_lst.append(pdbname)
@@ -207,6 +234,7 @@ def getscores(rankby):
          'Protein B': proteinB_lst,
          'iptm': iptmhighscore_lst,
          'ptm': ptmhighscore_lst,
+         'lis': lislst_lst,
          'minPAE': mincrosspae_lst,
          'scaledPAE': inv_mincrosspae_lst,
          'Model': pdbname_lst,
@@ -344,6 +372,45 @@ def getmincrosspae(paejson):
 
     return(subgrid.min())
 
+def get_lis(paejson, pae_cutoff):
+
+    pae, protnames, protlens = getpae(paejson)
+
+    if len(protnames) == 2:
+
+        subgrid1 = np.array(pae)[(protlens[0]+2):, 0:(protlens[0]-2)]
+        subgrid2 = np.array(pae)[0:(protlens[0]-2), (protlens[0]+2):]#mirror
+
+    elif len(protnames) == 3:
+
+        if protnames[0] == protnames[1]:
+            dimerlen = protlens[0]+protlens[1] # which should be the same
+            subgrid1 = np.array(pae)[(dimerlen+2):, 0:(dimerlen-2)]
+            subgrid2 = np.array(pae)[0:(dimerlen-2), (dimerlen+2):]#mirror
+
+        else:
+            dimerlen = protlens[1]+protlens[2] # which should be the same
+            subgrid1 = np.array(pae)[(protlens[0]+2):, 0:(protlens[0]-2)]
+            subgrid2 = np.array(pae)[0:(protlens[0]-2), (protlens[0]+2):]
+
+    elif len(protnames) == 4:
+
+        dimerlen = protlens[0]+protlens[1]
+        subgrid1 = np.array(pae)[(dimerlen+2):, 0:(dimerlen-2)]
+        subgrid2 = np.array(pae)[0:(dimerlen-2), (dimerlen+2):]
+
+    scaled_matrix1 = (pae_cutoff - subgrid1) / pae_cutoff
+    scaled_matrix1 = np.clip(scaled_matrix1, 0, 1)
+
+    scaled_matrix2 = (pae_cutoff - subgrid2) / pae_cutoff
+    scaled_matrix2 = np.clip(scaled_matrix2, 0, 1)
+
+    lis1 = np.mean(scaled_matrix1)
+    lis2 = np.mean(scaled_matrix2)
+    lis = (lis1+lis2)/2
+
+    return(lis)
+
 def summarize_pae_pdf(df, threshold, rankby):
     
     if threshold == 0:
@@ -480,7 +547,7 @@ def waitfor(filename):
 def summarize_paeandmodel_pdf(df, threshold, rankby):
     
     if threshold == 0:
-        pdfname = "PAEs-Models.pdf"
+        pdfname = "PAEs-Models-rankedby-"+rankby+".pdf"
     else:
         pdfname = "PAEs-Models-"+rankby+"-above-"+ str(threshold).replace(".", "p") + ".pdf"
     
@@ -498,6 +565,8 @@ def summarize_paeandmodel_pdf(df, threshold, rankby):
             
             if rankby=="scaledPAE":
                 plottitle = [result["Model"],"iptm: "+ iptmstring + ", ptm: "+ ptmstring,"minimum-pae: "+str("{:.2f}".format(result["minPAE"])) + ", scaled-pae: "+str("{:.2f}".format(result["scaledPAE"])), result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
+            elif rankby=="lis":
+                plottitle = [result["Model"],"iptm: "+ iptmstring + ", ptm: "+ ptmstring,"LIS: "+str("{:.4f}".format(result["lis"])), result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
             else:
                 plottitle = [result["Model"],"iptm: "+ iptmstring + ", ptm: "+ iptmstring, result["Protein A"]+" ("+result["SWISS-PROT Accessions Interactor A"]+")",result["Protein B"]+" ("+result["SWISS-PROT Accessions Interactor B"]+")"]
             plottitle = "\n".join(plottitle)

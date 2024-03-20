@@ -36,7 +36,7 @@ alphascreen --parse myproteinpairs.xlsx
 
 ### Running the predictions
 
-One of the files that is output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on ColabFold 1.3.0, 1.4.0, and 1.5.2 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from ColabFold).
+One of the files that is output is a bash script (*runpredictions.bsh*) with a list of commands to run Alphafold on each of the generated fasta files on your machine/cluster. The syntax is set up for the LMB, and will therefore likely not be directly compatible with your implementation. You can sort this by either editing *runpredictions.bsh* or *jobsetup.py* so that the commands will work. If you do change this, make sure the results are output into the *results* directory, which is important for the analysis command ```--show_top``` to work. The package has only been tested on Colabfold 1.3.0, 1.4.0, and 1.5.2 (when parsing the results, it is assumed that the PDBs and PAE json filenames are those from Colabfold).
 
 Important: The script will run all the jobs and relies on your queuing system to handle them!
 
@@ -52,9 +52,11 @@ The default behaviour for analysis (```--show_top```) is to go through one resul
 alphascreen --show_top 0.7
 ```
 
-If you want instead want to rank by iptm score, you can pass ```--rankby iptm```. This relies on your Alphafold/ColabFold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
+If you want instead want to rank by local interaction score (LIS) (Kim et al., 2024), you can pass ```--rank_by lis```. While iptm and ptm can be used for ranking as well, alphascreen relies on your Alphafold/Colabfold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
 
 *iptm:0.09 ptm:0.62*
+*iptm:0.02 ptm:0.63*
+*...*
 
 These values are just an example. Note the presence/absence of spaces and placement of colons.
 
@@ -162,7 +164,7 @@ Provide a fasta file to define custom IDs that you will use when running *--pars
 
 **```--alphafold_exec```** *```alphafold-executable```*
 
-Path to script that runs Alphafold for writing the commands. Default is *colabfold5* as per the LMB cluster usage.
+Path to script that runs Alphafold for writing the commands. Default is *colabfold4* as per the LMB cluster usage.
 
 **```--focus```** *```uniprot-id```*
 
@@ -194,7 +196,7 @@ Be careful not to run this while there are predictions in progress.
 alphascreen --show_top threshold [options]
 ```
 
-Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then rank all the predictions (also by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are output to a pdf. The ```--rankby``` option below has more information on the scaled-PAE. To output all predictions, pass ```--show_all```. The PAEs-Models pdf will also contain a snapshot of the prediction (see troubleshooting below if you get a "license" watermark on the models). A table is also output (.xlsx) that can be used as input for a subsequent run of alphascreen if you need to test different parameters on just the top hits.
+Generate summary files for the runs so far. For example, ```alphascreen --show_top 0.7``` will choose the model with the best interaction-site PAE for each prediction, and then rank all the predictions (also by the interaction-site PAE). Only those with scaled-PAEs higher than the threshold (e.g. 0.7) are output to a pdf. The ```--rank_by``` option below has more information on the scaled-PAE and LIS. To output all predictions, pass ```--show_all```. The PAEs-Models pdf will also contain a snapshot of the prediction (see troubleshooting below if you get a "license" watermark on the models). A table is also output (.xlsx) that can be used as input for a subsequent run of alphascreen if you need to test different parameters on just the top hits.
 
 Here is an example of one page from the PAEs-Models pdf:
 
@@ -208,9 +210,13 @@ Like ```--show_top```, but only outputs the table (.xlsx and .csv). No threshold
 
 **Options**
 
-**```--rankby```** ```pae``` or ```iptm``` or ```ptm```
+**```--rank_by```** ```pae``` or ```lis``` or ```iptm``` or ```ptm```
 
-Score by which models are ranked (***pae***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.7``` is a good starting point). The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--rankby iptm --show_top 0.3``` is a good starting point).
+Score by which models are ranked (***pae***, ***lis***, ***iptm***, or ***ptm***). The default is *pae*. This is used for both choosing the best model in a prediction as well as ranking those chosen models in the summary files. The option ```pae``` will look for the deepest PAE valleys only in the parts of the plot that are interactions between **different** proteins. The PAE is scaled to be between 0 and 1 where higher values are better predictions (```--show_top 0.7``` is a good starting point).
+
+The local interaction score (option ```lis```) (Kim et al., 2024) similarly analyzes those regions of the PAE (see the manuscript for more information). Great LIS scores are above 0.1 but the values can get quite small in some cases (```--rank_by lis --show_all``` is probably best).
+
+The options ```iptm``` and ```ptm``` rely on a *scores.txt* file in each results directory (see explanation at the top) (in this case ```--rank_by iptm --show_top 0.3``` is a good starting point).
 
 **```--overwrite```**
 
