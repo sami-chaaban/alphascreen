@@ -218,7 +218,7 @@ def getscores(rankby):
         if rankby=="lis":
             lislst_lst.append(lislst[paenumlst.index(m)])
         else:
-            mincrosspae_lst.append("-")
+            lislst_lst.append("-")
 
         pdbname = pdbpaths[modelnumlst.index(m)]
         pdbname_lst.append(pdbname)
