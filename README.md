@@ -62,7 +62,7 @@ These values are just an example. Note the presence/absence of spaces and placem
 
 ## Installation<a name="installation"></a>
 
-* Set up a fresh conda environment with Python >= 3.8: `conda create -n alphascreen python=3.8`
+* Set up a fresh conda environment with Python >= 3.9: `conda create -n alphascreen python=3.10`
 
 * Activate the environment: `conda activate alphascreen`.
 
