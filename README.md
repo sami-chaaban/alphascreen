@@ -54,8 +54,8 @@ alphascreen --show_top 0.7
 
 If you want instead want to rank by local interaction score (LIS) (Kim et al., 2024), you can pass ```--rank_by lis```. While iptm and ptm can be used for ranking as well, alphascreen relies on your Alphafold/Colabfold implementation writing the iptm and ptm scores to a *scores.txt* file within the individual results directories. It should have the same number of lines as there are models, each line containing the information in this format:
 
-*iptm:0.09 ptm:0.62*
-*iptm:0.02 ptm:0.63*
+*iptm:0.09 ptm:0.62*<br>
+*iptm:0.02 ptm:0.63*<br>
 *...*
 
 These values are just an example. Note the presence/absence of spaces and placement of colons.
