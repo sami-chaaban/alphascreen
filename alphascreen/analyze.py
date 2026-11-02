@@ -7,14 +7,21 @@ import pandas as pd
 import os
 from matplotlib.backends.backend_pdf import PdfPages
 from textwrap import wrap
-from pymol import cmd
 import cv2 as cv
 import glob
 import sys
 import time
-import pymol
 import math
 matplotlib.use('Agg')
+
+try:
+    import pymol
+    from pymol import cmd
+    PYMOL_AVAILABLE = True
+except ImportError:
+    PYMOL_AVAILABLE = False
+    cmd = None
+    finish_launching = None
 
 def getscores(rankby):
 
@@ -485,6 +492,10 @@ def write_top(df, threshold, rankby):
         
         
 def write_modelpngs(df, threshold, rankby, overwrite=False):
+
+    if not PYMOL_AVAILABLE:
+        print("\n>> Skipping model snapshots since PyMOL not available in this conda environment.")
+        return
 
     print("\n>> Writing model snapshots...")
 

@@ -23,8 +23,12 @@ def argparse():
         help="Approximate fragment length. Default is 500. For shorter fragments, try 250.")
 
     jobsetup_opts.add_option("--overlap",
-        action="store", dest="overlap", type="int", default=50, metavar='overlap-length',
-        help="Sequence is extended by this amount on either side of slices. Default is 50.")
+        action="store", dest="overlap", type="int", default=None, metavar='overlap-length',
+        help="Sequence is extended by this amount on either side of slices. Default is 50. This is an alternative to --step; they cannot be combined.")
+
+    jobsetup_opts.add_option("--step",
+        action="store", dest="step", type="string", default="", metavar='step-length',
+        help="Slide a window of --fragment amino acids along the sequence in steps of this many amino acids, instead of cutting it into abutting slices. For example, \"--fragment 50 --step 3\" gives 50-residue fragments starting every 3 residues. If you provided two uniprot IDs as input, you have the option to provide two step lengths here (step1/step2). This is an alternative to --overlap; they cannot be combined.")
 
     jobsetup_opts.add_option("--exhaustive",
         action="store_true", dest="exhaustive", default=False,
@@ -48,7 +52,7 @@ def argparse():
 
     jobsetup_opts.add_option("--consider",
         action="store", dest="consider", type="string", default="", metavar='sequence-to-consider',
-        help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (id/start/end).")
+        help="Uniprot ID and sequence range to consider. Example: \"Q86VS8/1/200\" only considers amino acids 1-200 for uniprot ID Q86VS8. Amino acids are numbered from 1 and both ends of the range are included. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (id/start/end).")
 
     jobsetup_opts.add_option("--customids",
         action="store", dest="customids", type="string", default="", metavar='custom-ids',

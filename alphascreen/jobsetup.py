@@ -3,14 +3,73 @@ import pandas as pd
 import os
 from pathlib import Path
 import sys
+import time
 import numpy as np
 from Bio import SeqIO
 
-def getuni(ACCESSION):
-    ENTRY = UniprotkbClient.fetch_one(ACCESSION)
+def getuni(ACCESSION, tries=3):
+    #The Uniprot REST API intermittently returns server errors, which a retry usually clears.
+    #An invalid accession gives a 404 instead, and there is no point in retrying that.
+    for t in range(tries):
+        try:
+            ENTRY = UniprotkbClient.fetch_one(ACCESSION)
+            break
+        except Exception as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if t == tries-1 or status is None or status < 500:
+                raise
+            time.sleep(2)
     SEQ = ENTRY['sequence']['value']
     NAME = ENTRY['uniProtkbId']
     return(NAME, SEQ)
+
+#Fragment names were numbered one amino acid too far at their C-terminal end before this version,
+#so the names in a fastas or results folder written earlier than this are not the names that the
+#current version would generate for the same proteins
+namingversion = (1,29)
+
+def getlogversion():
+
+    """
+    Reads the version of alphascreen that wrote log.txt in this directory. Returns it as a tuple of
+    integers, or None if there is no log.txt or the version can't be read from it.
+    """
+
+    if not os.path.exists('log.txt'):
+        return None
+
+    try:
+        with open('log.txt') as f:
+            for line in f:
+                if line.startswith("AlphaScreen version:"):
+                    return tuple(int(v) for v in line.split(":")[1].strip().split("."))
+    except Exception:
+        return None
+
+    return None
+
+def warnoldversion(reparsing=False):
+
+    """
+    Warns if the fastas and results in this directory were written by a version of alphascreen that
+    named fragments differently. Returns True if that is the case.
+    """
+
+    logversion = getlogversion()
+
+    if logversion is None or logversion >= namingversion:
+        return False
+
+    versionstr = ".".join(str(v) for v in logversion)
+
+    print("\n!! Warning: this directory was set up by alphascreen " + versionstr + ", which numbered the last amino acid of each fragment one too high.\n")
+
+    if reparsing:
+        print("!! The fragment names that will be written now are therefore not the names of the existing results,\n!! so the predictions already in the results folder will no longer be matched to a fasta file.\n!! Move or delete the results folder first if you meant to start over.\n")
+    else:
+        print("!! The existing names are being used as they are, so the runs are matched up correctly,\n!! but bear in mind that the second number in each fragment name is one higher than the\n!! last amino acid it actually contains. Re-running --parse here would rename the fragments.\n")
+
+    return True
 
 def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
     
@@ -30,8 +89,8 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
     else:
         Ainteractors = ["empty-cell" if x != x else x for x in Ainteractors] #replace nan-float with 0, which result from empty cells
         Binteractors = ["empty-cell" if x != x else x for x in Binteractors]
-    Ainteractors = [s.strip() for s in Ainteractors]
-    Binteractors = [s.strip() for s in Binteractors]
+    Ainteractors = [str(s).strip() for s in Ainteractors]
+    Binteractors = [str(s).strip() for s in Binteractors]
 
     if exhaustive:
         Ainteractors = list(set(Ainteractors))
@@ -62,7 +121,7 @@ def getinteractors(file,filetype, columnA, columnB, focus, exhaustive):
 
     return(Ainteractors, Binteractors)
 
-def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, customids, split=True,fraguniprot=0,fraglen=500,overlap=50,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2",ignoreself=False):
+def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,considerstart,considerend, customids, split=True,fraguniprot=0,fraglen=500,overlap=50,stepuniprot=0,step=None,dimerize="",dimerize_all=False,dimerize_except="",write=True,alphafold_exec="colabfold2",ignoreself=False):
     
     dimerizelst = []
     dontdimerizelst = []
@@ -123,13 +182,14 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
         os.makedirs('fastas', exist_ok=True)
         os.makedirs('results', exist_ok=True)
 
-    for fname in os.listdir('fastas'):
-        if fname.endswith('.fasta'):
-            sys.exit(">> Error: it looks like fasta files already exist in the fastas folder.\n")
+    if os.path.exists('fastas'):
+        for fname in os.listdir('fastas'):
+            if fname.endswith('.fasta'):
+                sys.exit(">> Error: it looks like fasta files already exist in the fastas folder.\n")
 
     colabfoldcommand = []
     unilst = []
-    failed = []
+    failed = {}
 
     if len(dontdimerizelst) != 0:
         alluniprots = list(set(list(Ainteractors+Binteractors)))
@@ -167,8 +227,8 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                 Unis_found.append(A)
                 Names_found.append(Aname)
                 Seqs_found.append(Aseq)
-        except:
-            failed.append(A)
+        except Exception as e:
+            failed[A] = str(e)
             continue
         try:
             if B in Unis_found:
@@ -185,8 +245,8 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                 Unis_found.append(B)
                 Names_found.append(Bname)
                 Seqs_found.append(Bseq)
-        except:
-            failed.append(B)
+        except Exception as e:
+            failed[B] = str(e)
             continue
             
         unilst.append(A + ":" + Aname)
@@ -200,7 +260,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
                 a = consideruniprot.index(A)
                 if considerend[a] > len(Aseq):
-                    sys.exit(">> Error: last amino acid to consider is outside the protein length for " + consideruniprot[a] + ". Maximum is " + str(len(Aseq)+1) + ".\n")
+                    sys.exit(">> Error: last amino acid to consider is outside the protein length for " + consideruniprot[a] + ". Maximum is " + str(len(Aseq)) + ".\n")
                 Aseq = Aseq[considerstart[a]:considerend[a]]
                 addmeA = considerstart[a]
 
@@ -211,7 +271,7 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
 
                 b = consideruniprot.index(B)
                 if considerend[b] > len(Bseq):
-                    sys.exit(">> Error: last amino acid to consider is outside the protein length for " + consideruniprot[b] + ". Maximum is " + str(len(Bseq)+1) + ".\n")
+                    sys.exit(">> Error: last amino acid to consider is outside the protein length for " + consideruniprot[b] + ". Maximum is " + str(len(Bseq)) + ".\n")
                 Bseq = Bseq[considerstart[b]:considerend[b]]
                 addmeB = considerstart[b]
 
@@ -228,7 +288,15 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             else:
                 fraglen_cur = fraglen
 
-            Anamelst, Aseqlst = splitfasta(Aname,Aseq,fraglen_cur,overlap,addmeA)
+            if type(step) == list:
+                if A in stepuniprot:
+                    step_cur=step[stepuniprot.index(A)]
+                else:
+                    step_cur = None
+            else:
+                step_cur = step
+
+            Anamelst, Aseqlst = splitfasta(Aname,Aseq,fraglen_cur,overlap,addmeA,step_cur)
 
             if type(fraglen) == list:
                 if B in fraguniprot:
@@ -238,7 +306,15 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             else:
                 fraglen_cur = fraglen
 
-            Bnamelst, Bseqlst = splitfasta(Bname,Bseq,fraglen_cur,overlap,addmeB)
+            if type(step) == list:
+                if B in stepuniprot:
+                    step_cur=step[stepuniprot.index(B)]
+                else:
+                    step_cur = None
+            else:
+                step_cur = step
+
+            Bnamelst, Bseqlst = splitfasta(Bname,Bseq,fraglen_cur,overlap,addmeB,step_cur)
 
         else:
 
@@ -272,16 +348,19 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
                 colabfoldcommand.append(alphafold_exec + " " + fastaname_minimal + " --output=results/" + An + "-" + Bn)
 
     if len(failed) > 0:
-        failed = list(set(failed))
         print("!! Warning: there was a problem getting the Uniprot data for accessions:\n")
         for f in failed:
-            print("·· "+ str(f) + "\n")
+            print("·· "+ str(f) + ": " + failed[f] + "\n")
 
     if len(notconsidered) > 0:
         for c in notconsidered:
             print("!! Warning: you asked to consider a region within " + c + ", but this ID wasn't in your input.\n")
 
-    colabfoldcommand=list(dict.fromkeys(colabfoldcommand)) 
+    colabfoldcommand=list(dict.fromkeys(colabfoldcommand))
+
+    #Without this, a run where every sequence failed to download still ends by saying "Done!"
+    if len(colabfoldcommand) == 0:
+        sys.exit(">> Error: no Alphafold commands could be generated. None of the sequences could be retrieved.\n")
 
     if write:
         print(">> Writing " + str(len(colabfoldcommand)) + " Alphafold commands...\n")
@@ -299,56 +378,77 @@ def getfastas_writecommands(Ainteractors, Binteractors, consideruniprot,consider
             
     print("Done!\n")
 
-def splitfasta(name,seq,fraglen,overlap,addme):
+def splitfasta(name,seq,fraglen,overlap,addme,step=None):
 
     seqlen = len(seq)
     #print(name, seqlen)
-    
-    splitinto = round(seqlen/fraglen)
-    #print(splitinto)
-    
-    test=[]
-    if splitinto in [0, 1]:
+
+    if step is not None and step == 0:
+        #An explicit step of zero means this protein is kept whole
         index_withOverlap = [[0,seqlen]]
+
+    elif step is not None:
+        #Slide a window of fraglen amino acids along the sequence in steps of "step"
+        if fraglen >= seqlen:
+            index_withOverlap = [[0,seqlen]]
+        else:
+            index_withOverlap = []
+            for start in range(0, seqlen-fraglen+1, step):
+                index_withOverlap.append([start, start+fraglen])
+            #Pin a final window to the C-terminus so the end of the sequence is always covered
+            if index_withOverlap[-1][1] < seqlen:
+                index_withOverlap.append([seqlen-fraglen, seqlen])
+
     else:
-        currfraglen = int(seqlen/splitinto)
-        middlefragindices=[]
-        for n in range(1,splitinto):
-            if n == 1 and splitinto > 2:
-                middlefragindices.append(currfraglen*n+int(overlap/2)) #account for overlap
-            elif n == splitinto-1 and splitinto > 2:
-                middlefragindices.append(currfraglen*n-int(overlap/2)) #account for overlap
-            else:
-                middlefragindices.append(currfraglen*n) 
-        
-        #print(middlefragindices)
-    
-        index_withOverlap=[]
-        for i,m in enumerate(middlefragindices):
-            if i == 0:
-                index_withOverlap.append([0, m+overlap])
-            else:
-                index_withOverlap.append([middlefragindices[i-1]-overlap, m+overlap])
-                
-        index_withOverlap.append([middlefragindices[-1]-overlap, seqlen])
-                    
-        #print(index_withOverlap)
-        
+        splitinto = round(seqlen/fraglen)
+        #print(splitinto)
+
+        if splitinto in [0, 1]:
+            index_withOverlap = [[0,seqlen]]
+        else:
+            currfraglen = int(seqlen/splitinto)
+            middlefragindices=[]
+            for n in range(1,splitinto):
+                if n == 1 and splitinto > 2:
+                    middlefragindices.append(currfraglen*n+int(overlap/2)) #account for overlap
+                elif n == splitinto-1 and splitinto > 2:
+                    middlefragindices.append(currfraglen*n-int(overlap/2)) #account for overlap
+                else:
+                    middlefragindices.append(currfraglen*n)
+
+            #print(middlefragindices)
+
+            index_withOverlap=[]
+            for i,m in enumerate(middlefragindices):
+                if i == 0:
+                    index_withOverlap.append([0, m+overlap])
+                else:
+                    index_withOverlap.append([middlefragindices[i-1]-overlap, m+overlap])
+
+            index_withOverlap.append([middlefragindices[-1]-overlap, seqlen])
+
+            #print(index_withOverlap)
+
+    #An overlap that is large relative to the fragment length pushes slice boundaries past the ends
+    #of the sequence, which would otherwise give empty sequences and negative residue numbers
+    index_withOverlap = [[max(0,i[0]), min(seqlen,i[1])] for i in index_withOverlap]
+    index_withOverlap = [list(i) for i in dict.fromkeys([tuple(i) for i in index_withOverlap])]
+
     splitlens_withOverlap = []
     for i in index_withOverlap:
         splitlens_withOverlap.append(i[1]-i[0])
     #print("New lengths", splitlens_withOverlap)
-        
+
     splitseqs_withOverlap = []
     newnames = []
-    
+
     for i in index_withOverlap:
-        
+
         splitseqs_withOverlap.append(seq[i[0]:i[1]])
-        newnames.append(name+"_"+str(i[0]+1+addme)+"_"+str(i[1]+1+addme))
-        
+        newnames.append(name+"_"+str(i[0]+1+addme)+"_"+str(i[1]+addme))
+
     #print(newnames)
-        
+
     return(newnames, splitseqs_withOverlap)
 
 def findunfinished(alphafold_exec, write=True):

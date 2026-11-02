@@ -28,7 +28,7 @@ For a step-by-step workflow, see the [Usage](#usage) section.
 
 This package generates fasta files for a set of interaction partners in order to run Alphafold predictions. The assumption is that your Alphafold implementation takes fasta files as input. The input to ```--parse``` is a table which includes two columns containing uniprot IDs for the interaction partners (column headers specified with ```--columnA``` and ```--columnB```). These tables can be generated manually or by a database (e.g. BioGRID). Acceptable extensions are .xlsx and .txt (tab-delimited, e.g. as output by BioGRID).
 
-The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. An overlap is considered (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```--dimerize_all_except```) and/or consider a specific stretch of sequence for a protein or set of proteins (```--consider```).
+The command ```--parse``` fetches the sequences from Uniprot and fragments them before generating fasta files, which are stored in the *fastas* folder. Fragmenting the sequences (```--fragment```) helps keep the total sequence length short enough so the jobs don't run out of memory. By default the sequence is cut into abutting slices, each extended by an overlap (```--overlap```) so that the fragmentation doesn't accidentally cut into an interaction interface. Alternatively, a fragment of fixed length can be walked along the sequence in small increments (```--step```) to scan for an interaction site; ```--overlap``` and ```--step``` are alternatives and cannot be combined. You can dimerize any or all proteins (```--dimerize```, ```--dimerize_all```, ```--dimerize_all_except```) and/or consider a specific stretch of sequence for a protein or set of proteins (```--consider```).
 
 ```
 alphascreen --parse myproteinpairs.xlsx
@@ -130,7 +130,26 @@ Approximate fragment length. Default is 500. If you provided two uniprot IDs as 
 
 **```--overlap```** *```length```*
 
-Sequence is extended by this amount on either side of slices. Default is 50.
+Sequence is extended by this amount on either side of slices. Default is 50. This is an alternative to ```--step``` (see below); the two cannot be combined.
+
+**```--step```** *```length```*
+
+Instead of cutting the sequence into abutting slices, slide a window of ```--fragment``` amino acids along it in steps of this many amino acids. For example, ```--fragment 50 --step 3``` generates 50-residue fragments starting at residues 1, 4, 7, and so on, with a final fragment pinned to the C-terminus so the end of the sequence is always covered. If you provided two uniprot IDs as input, you have the option to provide two step lengths here (*step1/step2*) corresponding to the step length of each uniprot ID; a step of 0 keeps that protein whole regardless of its fragment length.
+
+This is an alternative to ```--overlap```; the two cannot be combined. The difference is which number sets the spacing between fragments:
+
+| | fragment length | spacing between fragments |
+| --- | --- | --- |
+| ```--fragment 500 --overlap 50``` | 600 (*fragment* + 2×*overlap*) | 500 (*fragment*) |
+| ```--fragment 50 --step 3``` | 50 (*fragment*) | 3 (*step*) |
+
+With ```--overlap```, the spacing is always the fragment length, so it cannot be used to walk a short window along a sequence in small increments. Use ```--step``` for that. For example, to scan 50-residue windows of one protein in 3-residue steps against the full length of another:
+
+```
+alphascreen --parse uniprot-id-1/uniprot-id-2 --fragment 2000/50 --step 3
+```
+
+Here the fragment length of 2000 exceeds the length of the first protein, so it is kept whole, while the second is scanned. Bear in mind that a small step generates a large number of predictions: a 500-residue protein scanned in 3-residue steps is about 150 jobs.
 
 **```--exhaustive```**
 
@@ -156,7 +175,7 @@ Dimerize all proteins except the uniprot ID provided here. Alternatively, provid
 
 **```--consider```** *```uniprot/start/end```* or *```consider.txt```*
 
-Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only considers amino acids 1-200 for uniprot ID Q86VS8. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (*id/start/end*).
+Uniprot ID and sequence range to consider. Example: *Q86VS8/1/200* only considers amino acids 1-200 for uniprot ID Q86VS8. Amino acids are numbered from 1 and both ends of the range are included, so this example gives 200 amino acids. Alternatively, provide a text file with a single column list of sequences to consider with a similar syntax (*id/start/end*).
 
 **```--customids```** *```sequences.fasta```*
 
@@ -225,6 +244,8 @@ Overwrite .png snapshots that have already been generated, otherwise it will ski
 ## Troubleshooting<a name="troubleshooting"></a>
 
 * If a "license expired" watermark appears on the model images in PAEs-Models.pdf, follow the instructions here to update your pymol license: https://pymol.org/dsc/ip/license/. You may have to be on your institute's VPN for the link to direct you to a download page rather than an invoice verification page.
+
+* Up to version 1.28, the second number in a fragment name was one higher than the last amino acid the fragment actually contained (a 55-residue fragment starting at the N-terminus was named *1_56*). This was corrected in 1.29. Directories set up by an earlier version are detected from the version recorded in *log.txt*, and ```--check```, ```--write_unfinished```, ```--show_top```, ```--show_all``` and ```--write_table``` will say so before they run. They use the existing names as they are, so finished runs are still recognised and ```runpredictions-unfinished.bsh``` still points at the right folders; only the numbering in the old names is off by one. Re-running ```--parse``` in such a directory does rename the fragments, which leaves the predictions already in the results folder unmatched, so you are warned about that separately.
 
 ## License<a name="license"></a>
 
